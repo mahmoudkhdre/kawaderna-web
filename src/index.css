@@ -1,0 +1,57 @@
+
+
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    direction: rtl;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Tajawal', sans-serif;
+    background-color: #ffffff;
+    color: #212529;
+    line-height: 1.5;
+  }
+
+  /* Focus visible for accessibility */
+  *:focus-visible {
+    outline: 2px solid #0D6EFD;
+    outline-offset: 2px;
+  }
+}
+
+/* LTR isolation for Request IDs, technical identifiers, timestamps */
+.ltr-isolated {
+  direction: ltr;
+  unicode-bidi: embed;
+  font-family: ui-monospace, 'Courier New', monospace;
+}
+
+/* Tajawal is distributed under SIL OFL 1.1; license beside the source assets. */
+@font-face { font-family: 'Tajawal'; font-style: normal; font-weight: 400; font-display: swap; src: url('./features/landing/assets/fonts/Tajawal-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Tajawal'; font-style: normal; font-weight: 500; font-display: swap; src: url('./features/landing/assets/fonts/Tajawal-Medium.ttf') format('truetype'); }
+@font-face { font-family: 'Tajawal'; font-style: normal; font-weight: 700; font-display: swap; src: url('./features/landing/assets/fonts/Tajawal-Bold.ttf') format('truetype'); }
+.demo-return { display: block; min-height: 44px; padding: 12px 16px; text-align: start; text-decoration: underline; }
+.demo-return:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
+
+/* The return link and the demo share one viewport-height column, so the link never adds page scroll. */
+.demo-route { display: flex; flex-direction: column; min-height: 100dvh; }
+.demo-route > .demo-return { flex: none; }
+.demo-route > .kd-login, .demo-route > .kd-shell { flex: 1 0 auto; min-height: 0; }
+
+@media (max-width: 767px) {
+  /* The return link shares the viewport with the shell's fixed mobile navigation. */
+  .demo-route--shell { height: 100dvh; }
+  .demo-route--shell > .kd-shell { flex: 1 1 0; height: auto; }
+}
