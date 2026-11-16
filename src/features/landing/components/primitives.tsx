@@ -1,7 +1,7 @@
 import type { ElementType, MouseEvent, ReactNode } from 'react';
 import {
   ArrowLeft, Calendar, ChartColumnIncreasing, Clock, CreditCard, Crown, DollarSign, HeartPulse, LayoutDashboard,
-  ListTodo, Settings, ShieldCheck, Sparkles, Target, Users, Wallet,
+  FileText, KeyRound, ListTodo, Mail, Network, Palette, Play, Settings, ShieldCheck, Sparkles, Target, Users, Wallet,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useReveal } from './useReveal';
@@ -10,7 +10,8 @@ const ICONS: Record<string, LucideIcon> = {
   calendar: Calendar, users: Users, clock: Clock, 'list-todo': ListTodo, 'dollar-sign': DollarSign,
   'shield-check': ShieldCheck, 'credit-card': CreditCard, 'heart-pulse': HeartPulse, wallet: Wallet,
   'layout-dashboard': LayoutDashboard, target: Target, 'chart-column-increasing': ChartColumnIncreasing,
-  settings: Settings, sparkles: Sparkles,
+  settings: Settings, sparkles: Sparkles, palette: Palette, network: Network, 'file-text': FileText,
+  'key-round': KeyRound, play: Play,
 };
 
 export const ModuleIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
@@ -29,7 +30,7 @@ export interface DemoLinkProps {
   readonly href: string;
   readonly onStartDemo?: () => void;
   readonly label: string;
-  readonly variant?: 'primary' | 'onDark';
+  readonly variant?: 'primary' | 'onDark' | 'ghost' | 'outlineDark';
   readonly size?: 'md' | 'lg';
   readonly placement: string;
 }
@@ -51,6 +52,22 @@ export const DemoLink = ({ href, onStartDemo, label, variant = 'primary', size =
     </a>
   );
 };
+
+export interface InquiryLinkProps {
+  readonly href: string;
+  readonly label: string;
+  readonly variant?: 'primary' | 'onDark';
+  readonly size?: 'md' | 'lg';
+  readonly placement: string;
+}
+
+/** The primary purchase-inquiry CTA: a plain link to the owner-approved contact destination (no checkout, no form). */
+export const InquiryLink = ({ href, label, variant = 'primary', size = 'md', placement }: InquiryLinkProps) => (
+  <a className={`ld-btn ld-btn--${variant} ld-btn--${size}`} href={href} data-contact-cta={placement}>
+    <Mail size={18} strokeWidth={1.5} aria-hidden="true" focusable="false" />
+    <span>{label}</span>
+  </a>
+);
 
 export const Reveal = ({ as: Tag = 'div', className = '', children, delay = 0 }: {
   as?: ElementType; className?: string; children: ReactNode; delay?: number;

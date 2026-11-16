@@ -1,6 +1,6 @@
 import { BookOpen, Check, Mail, MessageCircle, Phone, Plus } from 'lucide-react';
 import { BRAND, CREATOR, CTA, FAQ, FINAL, FOOTER } from '../content';
-import { BrandMark, DemoLink, Reveal, SectionHeading } from './primitives';
+import { BrandMark, DemoLink, InquiryLink, Reveal, SectionHeading } from './primitives';
 
 export const Faq = () => (
   <section id="faq" className="ld-section ld-faq" aria-labelledby="ld-faq-title">
@@ -68,7 +68,7 @@ export const Creator = () => (
   </section>
 );
 
-interface FinalCtaProps { demoHref: string; onStartDemo?: () => void; contactHref?: string }
+interface FinalCtaProps { demoHref: string; onStartDemo?: () => void; contactHref: string }
 
 export const FinalCta = ({ demoHref, onStartDemo, contactHref }: FinalCtaProps) => (
   <section className="ld-final" aria-labelledby="ld-final-title">
@@ -77,10 +77,8 @@ export const FinalCta = ({ demoHref, onStartDemo, contactHref }: FinalCtaProps) 
       <h2 id="ld-final-title" className="ld-final__title">{FINAL.title}</h2>
       <p className="ld-final__body">{FINAL.body}</p>
       <div className="ld-final__actions">
-        <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.primary} variant="onDark" size="lg" placement="final" />
-        {contactHref && (
-          <a className="ld-btn ld-btn--outlineDark ld-btn--lg" href={contactHref} data-contact-cta="true">{FINAL.contact}</a>
-        )}
+        <InquiryLink href={contactHref} label={CTA.primary} variant="onDark" size="lg" placement="final" />
+        <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.secondary} variant="outlineDark" size="lg" placement="final" />
       </div>
       <p className="ld-final__note">{FINAL.note}</p>
     </div>

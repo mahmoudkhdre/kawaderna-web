@@ -53,7 +53,12 @@ test('new tab entry, unknown path and visitor isolation', async ({ browser, page
   const other = await visitor.newPage();
   await other.goto(new URL('/demo', baseURL).href);
   await expect(other.locator('[data-demo-login]')).toBeVisible();
+  // Unknown paths show the minimal not-found page (no redirect), with a way back to the Landing and the demo.
   await other.goto(new URL('/unknown', baseURL).href);
+  await expect(other.locator('[data-not-found]')).toBeVisible();
+  await expect(other.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  await other.getByRole('link', { name: 'العودة إلى العرض التعريفي' }).click();
+  await expect(other).toHaveURL(/\/$/);
   await expect(other.locator('[data-landing-page]')).toBeVisible();
   await visitor.close();
 });

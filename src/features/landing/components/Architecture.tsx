@@ -34,6 +34,17 @@ export const Architecture = () => (
   <section id="architecture" className="ld-section ld-arch" aria-labelledby="ld-arch-title">
     <div className="ld-container">
       <SectionHeading id="ld-arch-title" kicker={ARCHITECTURE.kicker} title={ARCHITECTURE.title} body={ARCHITECTURE.body} />
+      <div className="ld-track" data-dm-track="true">
+        <div className="ld-track__main">
+          <h3 className="ld-h5">{ARCHITECTURE.track.label}</h3>
+          <p>{ARCHITECTURE.track.purpose}</p>
+          <p className="ld-track__value">{ARCHITECTURE.track.value}</p>
+        </div>
+        <dl className="ld-track__status">
+          <div data-dm-status="existing"><dt>{ARCHITECTURE.track.existing.title}</dt><dd>{ARCHITECTURE.track.existing.body}</dd></div>
+          <div data-dm-status="pending"><dt>{ARCHITECTURE.track.pending.title}</dt><dd>{ARCHITECTURE.track.pending.body}</dd></div>
+        </dl>
+      </div>
       <div className="ld-arch__modes">
         {ARCHITECTURE.modes.map((m, i) => (
           <Reveal key={m.id} delay={i * 80}><ModePanel mode={m} /></Reveal>
@@ -44,6 +55,7 @@ export const Architecture = () => (
         <div className="ld-studies" data-bp-studies="true">
           <h3 className="ld-arch__docs-title">{ARCHITECTURE.studiesLabel}</h3>
           <p>{ARCHITECTURE.studies}</p>
+          <p className="ld-arch__note">{ARCHITECTURE.providerNote}</p>
         </div>
         <div>
           <h3 className="ld-arch__docs-title">{ARCHITECTURE.docsTitle}</h3>

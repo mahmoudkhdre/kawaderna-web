@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, Sparkles } from 'lucide-react';
-import { AI_SHOTS, AI_SPACE, TOOLKIT } from '../content';
+import { AI_SHOTS, AI_SPACE, AI_USE_CASES, TOOLKIT } from '../content';
 import type { AiShotId } from '../content';
 import { Reveal, SectionHeading } from './primitives';
 import { useTabKeys } from './Tabs';
@@ -69,6 +69,34 @@ export const AiSpace = () => {
           </ol>
         </div>
 
+        <div className="ld-usecases" data-ai-usecases="true" aria-labelledby="ld-usecases-title">
+          <div className="ld-usecases__head">
+            <h3 id="ld-usecases-title" className="ld-h5">{AI_USE_CASES.title}</h3>
+            <p>{AI_USE_CASES.body}</p>
+            <p className="ld-usecases__status">{AI_USE_CASES.status}</p>
+          </div>
+          <div className="ld-usecases__groups">
+            {AI_USE_CASES.groups.map(g => (
+              <div role="group" key={g.kind} className={`ld-usecases__group ld-usecases__group--${g.kind}`} data-usecase-group={g.kind}
+                aria-labelledby={`ld-usecases-${g.kind}`}>
+                <h4 id={`ld-usecases-${g.kind}`} className="ld-h6 ld-usecases__group-title">
+                  {g.title} <span className="ld-usecases__count">{g.items.length === 3 ? '٣ حالات' : 'حالتان'}</span>
+                </h4>
+                <p className="ld-usecases__group-body">{g.body}</p>
+                <ul>
+                  {g.items.map(c => (
+                    <li key={c.id} className="ld-usecase" data-usecase={c.id}>
+                      <span className="ld-usecase__domain">{c.domain}</span>
+                      <strong className="ld-usecase__title">{c.title}</strong>
+                      <span className="ld-usecase__body">{c.body}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="ld-toolkit ld-toolkit--single" data-toolkit="true">
           <Reveal className="ld-toolkit__intro">
             <h3 className="ld-h5">{TOOLKIT.title}</h3>
@@ -78,7 +106,16 @@ export const AiSpace = () => {
                 <li key={b}><span>{b}</span></li>
               ))}
             </ul>
+            <p className="ld-toolkit__editions-label">{TOOLKIT.editionsLabel}</p>
+            <ul className="ld-toolkit__editions" aria-label={TOOLKIT.editionsLabel}>
+              {TOOLKIT.editions.map(e => (
+                <li key={e.id} data-toolkit-edition={e.id}><strong>{e.title}</strong><span>{e.body}</span></li>
+              ))}
+            </ul>
             <p className="ld-toolkit__note">{TOOLKIT.specsNote}</p>
+            <a className="ld-textlink" href="#creator" data-ai-inquiry="true">
+              {TOOLKIT.inquiry}<ArrowLeft size={16} strokeWidth={1.5} aria-hidden="true" />
+            </a>
           </Reveal>
         </div>
       </div>

@@ -191,10 +191,11 @@ for (const width of [768, 1024, 1280]) {
 
 test('tab title, description and favicon identify Kawaderna, not the scaffold', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle('كوادرنا — عرض تجريبي لطلبات الإجازة');
+  // Commercial V1 metadata: the Landing positions the design and development foundation, and says it is not a ready-to-run platform.
+  await expect(page).toHaveTitle('كوادرنا — أساس تصميم وتطوير منصات الموارد البشرية العربية');
   const description = await page.locator('meta[name="description"]').getAttribute('content');
-  expect(description).toContain('عرض تجريبي');
-  expect(description).toContain('ليس نظامًا جاهزًا للتشغيل');
+  expect(description).toContain('ديمو الإجازات');
+  expect(description).toContain('ليست منصة جاهزة للتشغيل');
   const href = await page.locator('link[rel="icon"]').getAttribute('href');
   const svg = await (await page.request.get(href!)).text();
   expect(svg).toContain('كوادرنا');

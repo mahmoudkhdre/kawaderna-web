@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { BRAND, CTA, NAV_LINKS } from '../content';
-import { BrandMark, DemoLink } from './primitives';
+import { BrandMark, DemoLink, InquiryLink } from './primitives';
 import type { LandingTheme } from './useTheme';
 
-export const LandingNav = ({ demoHref, onStartDemo, theme, onToggleTheme }: {
-  demoHref: string; onStartDemo?: () => void; theme: LandingTheme; onToggleTheme: () => void;
+export const LandingNav = ({ demoHref, onStartDemo, contactHref, theme, onToggleTheme }: {
+  demoHref: string; onStartDemo?: () => void; contactHref: string; theme: LandingTheme; onToggleTheme: () => void;
 }) => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -46,7 +46,8 @@ export const LandingNav = ({ demoHref, onStartDemo, theme, onToggleTheme }: {
           {theme === 'dark' ? <Sun size={18} strokeWidth={1.5} aria-hidden="true" /> : <Moon size={18} strokeWidth={1.5} aria-hidden="true" />}
         </button>
         <div className="ld-nav__cta">
-          <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.primary} placement="nav" />
+          <span className="ld-nav__demo"><DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.secondary} variant="ghost" placement="nav" /></span>
+          <InquiryLink href={contactHref} label={CTA.primary} placement="nav" />
         </div>
         <button ref={toggleRef} type="button" className="ld-nav__toggle" aria-expanded={open}
           aria-controls="ld-mobile-menu" onClick={() => setOpen(v => !v)}>
@@ -61,7 +62,10 @@ export const LandingNav = ({ demoHref, onStartDemo, theme, onToggleTheme }: {
               <li key={link.href}><a href={link.href} onClick={() => setOpen(false)}>{link.label}</a></li>
             ))}
           </ul>
-          <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.primary} placement="mobile-menu" size="lg" />
+          <div className="ld-nav__panel-actions">
+            <InquiryLink href={contactHref} label={CTA.primary} placement="mobile-menu" size="lg" />
+            <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.secondary} variant="ghost" placement="mobile-menu" size="lg" />
+          </div>
         </nav>
       </div>
     </header>

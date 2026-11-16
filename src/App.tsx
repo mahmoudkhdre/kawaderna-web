@@ -4,9 +4,10 @@ import { EmployeeLeavePage } from './pages/EmployeeLeave/EmployeeLeavePage'
 import { useDemo } from './demo/useDemo'
 import { DemoLogin, DemoResetConfirmation, DemoShell } from './demo/ui'
 import { useEffect, useRef } from 'react'
-import { BrowserRouter, Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import type { DemoEntry } from './demo/ui-contract'
 import { LandingPage } from './features/landing'
+import { NotFound } from './features/landing/NotFound'
 import { tokens } from './lib/tokens'
 
 const returnStyle = { color: tokens.colors.primary.base, background: tokens.colors.background.primary }
@@ -26,6 +27,17 @@ function LeaveDemo({ demo }: { demo: DemoEntry }) {
     target.tabIndex = -1
     target.focus({ preventScroll: true })
   }, [signedInAs])
+
+  // The demo route keeps its own accurate title/description; the landing metadata is restored on leaving.
+  useEffect(() => {
+    const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]')
+    const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+    const prev = { title: document.title, desc: desc?.content ?? '', canonical: canonical?.href ?? '' }
+    if (canonical) canonical.href = new URL('/demo', canonical.href).href
+    document.title = 'كوادرنا — ديمو طلبات الإجازة'
+    if (desc) desc.content = 'عرض تجريبي تفاعلي لمسار طلب الإجازة في كوادرنا (موظف ← مدير ← موارد بشرية) ببيانات وحسابات افتراضية. ليس نظامًا جاهزًا للتشغيل.'
+    return () => { document.title = prev.title; if (desc) desc.content = prev.desc; if (canonical) canonical.href = prev.canonical }
+  }, [])
 
   if (!demo.session) return <div className="demo-route"><Link className="demo-return" style={returnStyle} to="/">العودة إلى العرض التعريفي</Link><DemoLogin
     onLogin={demo.login}
@@ -80,7 +92,7 @@ function IntegratedExperience() {
   return <Routes>
     <Route path="/" element={<LandingPage demoHref="/demo" onStartDemo={() => navigate('/demo')} contactHref={import.meta.env.VITE_BUYER_CONTACT_HREF || undefined} />} />
     <Route path="/demo" element={<LeaveDemo demo={demo} />} />
-    <Route path="*" element={<Navigate to="/" replace />} />
+    <Route path="*" element={<NotFound />} />
   </Routes>
 }
 

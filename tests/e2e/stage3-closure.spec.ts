@@ -74,7 +74,8 @@ for (const width of [375, 1440]) {
 
 for (const placement of ['nav', 'mobile-menu', 'hero', 'journey', 'final']) {
   test(`mounted ${placement} CTA opens the demo and restores history`, async ({ page }) => {
-    await page.setViewportSize({ width: placement === 'mobile-menu' ? 375 : 1440, height: 900 });
+    // The secondary demo link joins the desktop nav only from 1600px (Commercial V1: the purchase inquiry is the sole nav action below that).
+    await page.setViewportSize({ width: placement === 'mobile-menu' ? 375 : placement === 'nav' ? 1600 : 1440, height: 900 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
     if (placement === 'mobile-menu') await page.getByRole('button', { name: 'فتح القائمة' }).click();

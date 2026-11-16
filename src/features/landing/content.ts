@@ -27,22 +27,24 @@ export interface LandingModule {
   readonly status: ModuleStatus;
   /** Optional, evidence-backed note (spec section or Figma component). */
   readonly evidence?: string;
+  /** Cross-reference to designed AI interactions for this domain (AI_USE_CASES); links to #ai. Designed only, never live. */
+  readonly ai?: string;
 }
 
 export type GroupShotId = 'attendance' | 'salary' | 'performance' | 'settings';
 
 /**
- * Crops of real Figma pages (file 3vNsjBj9Gen1HSrtKrjd13, page `web app`). Every crop excludes the
+ * Crops of real Figma pages (original design file, page `web app`; frame ids are kept out of the shipped bundle). Every crop excludes the
  * on-canvas banners that state regulatory conformity, so the landing page never repeats that claim.
  */
-export const GROUP_SHOTS: Record<GroupShotId, { readonly node: string; readonly caption: string; readonly alt: string }> = {
-  attendance: { node: '811:21571', caption: 'صفحة الحضور والانصراف · من ملف التصميم',
+export const GROUP_SHOTS: Record<GroupShotId, { readonly caption: string; readonly alt: string }> = {
+  attendance: { caption: 'صفحة الحضور والانصراف · من ملف التصميم',
     alt: 'بطاقات الحضور اليوم والغياب وحالات التأخير ومتوسط ساعات العمل من صفحة الحضور والانصراف في ملف التصميم' },
-  salary: { node: '866:22812', caption: 'صفحة إدارة الرواتب · من ملف التصميم',
+  salary: { caption: 'صفحة إدارة الرواتب · من ملف التصميم',
     alt: 'بطاقات إجمالي الرواتب ومتوسطها والمساهمات التأمينية والمدفوع من صفحة إدارة الرواتب في ملف التصميم' },
-  performance: { node: '1067:29882', caption: 'صفحة إدارة الأداء · من ملف التصميم',
+  performance: { caption: 'صفحة إدارة الأداء · من ملف التصميم',
     alt: 'بطاقات تقييم الموظفين في صفحة إدارة الأداء من ملف التصميم: التقييم الإجمالي وإنجاز الأهداف والمهارات وموعد التقييم القادم' },
-  settings: { node: '1343:40948', caption: 'صفحة الإعدادات · من ملف التصميم',
+  settings: { caption: 'صفحة الإعدادات · من ملف التصميم',
     alt: 'صفحة الإعدادات من ملف التصميم: إدارة صلاحيات الموظفين بأدوارهم، وقائمة أقسام الإعدادات من معلومات الشركة إلى طرق الدفع' },
 };
 
@@ -61,9 +63,10 @@ export const STATUS_LABEL: Record<ModuleStatus, string> = {
   vision: 'مفهوم مصمَّم · لا يعمل',
 };
 
+/** Commercial V1 hierarchy: the purchase inquiry is the primary action, the demo is the secondary one. */
 export const CTA = {
-  primary: 'جرّب الديمو التفاعلي',
-  secondary: 'ما تحصل عليه',
+  primary: 'استفسر عن شراء الحزمة',
+  secondary: 'جرّب الديمو',
 } as const;
 
 export const NAV_LINKS = [
@@ -71,7 +74,7 @@ export const NAV_LINKS = [
   { href: '#design-system', label: 'نظام التصميم' },
   { href: '#ai', label: 'الذكاء الاصطناعي' },
   { href: '#architecture', label: 'البنية والتكامل' },
-  { href: '#package', label: 'ما تحصل عليه' },
+  { href: '#package', label: 'محتوى الباقة' },
   { href: '#faq', label: 'أسئلة شائعة' },
   { href: '#creator', label: 'تواصل' },
 ] as const;
@@ -89,21 +92,43 @@ export const BRAND = {
 } as const;
 
 export const HERO = {
-  titleLead: 'منظومة موارد بشرية',
-  titleAccent: 'صُمِّمت بالعربية',
+  titleLead: 'كوادرنا — أساس تصميم وتطوير',
+  titleAccent: 'منصات الموارد البشرية العربية',
   lede:
-    'لشركات البرمجيات والمنشآت التي تريد منتج موارد بشرية عربيًا من البداية، لا ترجمة لاحقة. كل وحدة لها صفحة مصمَّمة، والذكاء الاصطناعي والبنية موثَّقان، ورحلة الإجازة تعمل فعلًا.',
+    'لشركات البرمجيات ووكالات التطوير وفرق المنتج التي تبني منصة موارد بشرية عربية أو تخصّص منصة قائمة: تصاميم ونظام تصميم وأصول تطوير مبنية بالعربية من البداية، لتبدأ من أساس منظَّم بدل شاشات فارغة.',
+  note: 'الباقة والترخيص يُتفق عليهما مباشرة مع المالك.',
   proofCaption: 'شاشات من ملف التصميم · بيانات نموذجية',
   desktopAlt: 'لوحة تحكم كوادرنا من ملف التصميم: ترحيب بالتاريخ الهجري، وشريط مواقيت الصلاة في الرياض، وبطاقات الطلبات المعلقة والموافقات والموظفين، وشريط التنقل الجانبي بكل الوحدات',
   mobileAlt: 'شاشة «إجازتي» للموظف على الجوال من ملف التصميم: أرصدة الإجازة السنوية والمرضية والطارئة، وطلبات بحالات موافق عليها وقيد المراجعة ومرفوض',
-  meta: 'Figma · نظام تصميم · مواصفات ذكاء اصطناعي · مخططات مرجعية · ديمو React',
-  /** Visible deliverable strip under the hero actions (verified counts only: STAGE-2C-SPEC.md §4). */
-  deliverablesLabel: 'في الحزمة',
-  stats: [
-    { value: '١٤', label: 'وحدة مصمَّمة في Figma' },
-    { value: '٥', label: 'مواصفات ذكاء اصطناعي موثَّقة' },
-  ],
-  deliverables: ['نظام تصميم بمتغيرات ومكوّنات', 'مخططات مرجعية للبنية والتكامل', 'ديمو تفاعلي لرحلة الإجازة'],
+  meta: 'Figma · نظام تصميم · مواصفات ذكاء اصطناعي · مراجع معمارية · ديمو React',
+} as const;
+
+export type ValueState = 'preview' | 'pending';
+
+/**
+ * Commercial value overview near the hero (Commercial V1). `state` is the only per-item status and the one place to
+ * update after final Figma/package acceptance: `preview` = can be inspected on this page or in the demo today;
+ * `pending` = content is settled in the approved package and licence. No count of screens, modules or nodes appears here.
+ */
+export const VALUE = {
+  label: 'ما الذي تقدّمه كوادرنا',
+  legend: { preview: 'يمكن معاينته الآن', pending: 'يُحسم محتواه في الباقة المعتمدة' },
+  items: [
+    { id: 'hr', icon: 'layout-dashboard', state: 'preview', title: 'تصاميم الموارد البشرية',
+      body: 'شاشات ديسكتوب وجوال لمجالات إدارة الموارد البشرية، بالعربية واتجاه RTL.' },
+    { id: 'system', icon: 'palette', state: 'preview', title: 'نظام التصميم',
+      body: 'متغيرات ومكتبة مكوّنات بحالاتها، ليبقى كل جديد على النظام نفسه.' },
+    { id: 'ai', icon: 'sparkles', state: 'preview', title: 'مساحة الذكاء الاصطناعي',
+      body: 'تصاميم المساعد وخمس حالات استخدام موثَّقة. مصمَّمة فقط ولا تعمل في الديمو.' },
+    { id: 'data', icon: 'network', state: 'pending', title: 'خرائط البيانات والتكامل',
+      body: 'مسار تصميمي ومراجع معمارية. اكتمال تصاميمه النهائية قيد الاعتماد.' },
+    { id: 'handoff', icon: 'file-text', state: 'pending', title: 'تسليم المطوّرين',
+      body: 'مواصفات رحلة الإجازة بمعايير قبول، وما يلحق بها وفق الباقة.' },
+    { id: 'toolkit', icon: 'key-round', state: 'pending', title: 'منظومة القوالب',
+      body: 'أصل مرخَّص بشكل منفصل (Prompt Toolkit) حيثما تنطبق الباقة.' },
+    { id: 'demo', icon: 'play', state: 'preview', title: 'ديمو الإجازات بـ React',
+      body: 'رحلة الموظف والمدير والموارد البشرية تعمل ببيانات وحسابات افتراضية.' },
+  ] satisfies readonly { id: string; icon: string; state: ValueState; title: string; body: string }[],
 } as const;
 
 export const VISION = {
@@ -128,15 +153,25 @@ export const PROCESS = {
   steps: [
     { title: 'تدقيق قبل التصميم', body: 'مراجعة مكتوبة للمواصفات وشاشات المرجع وقوالب الذكاء الاصطناعي قبل تعديل أي شاشة.' },
     { title: 'تدفقات عربية للأدوار', body: 'مواصفة بالعربية لمسار الطلب بين الموظف والمدير والموارد البشرية، بالمسؤول والمخاطر.' },
-    { title: 'نظام تصميم ثم صفحات', body: 'رموز ومكوّنات أولًا، ثم صفحة ديسكتوب لكل وحدة وشاشات للجوال.' },
+    { title: 'نظام تصميم ثم صفحات', body: 'رموز ومكوّنات أولًا، ثم صفحات المجالات الأساسية وشاشات للجوال.' },
     { title: 'معايير قبول لكل مرحلة', body: 'كل مرحلة في رحلة الإجازة لها مواصفة ومعايير قبول، ثم تُنفَّذ في الديمو وتُختبر.' },
   ],
 } as const;
 
 export const ECOSYSTEM = {
   kicker: 'وحدات المنتج',
-  title: 'أربع عشرة وحدة، لكلٍّ منها صفحتها المصمَّمة',
-  body: 'كل وحدة في التنقل لها صفحة ديسكتوب كاملة في ملف Figma. الإجازات وحدها تعمل في الديمو.',
+  title: 'مجموعة متكاملة من مجالات إدارة الموارد البشرية المصمَّمة',
+  body: 'مصمَّمة في ملف Figma بنظام تصميم موحّد، ولا يُقدَّم أيٌّ منها منتجًا جاهزًا للتشغيل. الإجازات وحدها تعمل في الديمو، والنطاق النهائي يُثبَّت مع الباقة المعتمدة.',
+  /** Items that sit around the module list rather than inside it. No count is stated for the list (final inventory pending). */
+  layersLabel: 'ضمن المنتج أيضًا',
+  layers: [
+    { id: 'dashboard', title: 'لوحة التحكم',
+      body: 'واجهة الدخول إلى المنصّة: ملخص يومي للمدير بالطلبات المعلقة والحضور الأسبوعي ومواقيت الصلاة.' },
+    { id: 'ai', title: 'المساعد الذكي',
+      body: 'ميزة مصمَّمة تمتد عبر المنتج، وتجدها في مساحة الذكاء الاصطناعي أدناه.' },
+    { id: 'admin', title: 'خرائط البيانات والتكامل',
+      body: 'مسار تصميمي داعم لإدارة المنصّة، تفاصيله في قسم البنية والتكامل.' },
+  ],
 } as const;
 
 export const MODULE_GROUPS: readonly ModuleGroup[] = [
@@ -172,7 +207,8 @@ export const MODULE_GROUPS: readonly ModuleGroup[] = [
       { id: 'insurance', name: 'التأمين الصحي', icon: 'heart-pulse', status: 'designed',
         value: 'المؤمَّن عليهم والأقساط والمطالبات ومعدل الاستخدام، ووثيقة التأمين لكل موظف.' },
       { id: 'financial-health', name: 'الصحة المالية', icon: 'wallet', status: 'designed',
-        value: 'أهداف ادخار ومؤشر للصحة المالية يساعدان الموظف على فهم وضعه.' },
+        value: 'أهداف ادخار ومؤشر للصحة المالية يساعدان الموظف على فهم وضعه.',
+        ai: 'تحليل وشرح مصمَّمان' },
     ],
   },
   {
@@ -181,12 +217,12 @@ export const MODULE_GROUPS: readonly ModuleGroup[] = [
     summary: 'من التقييم إلى القرار',
     shot: 'performance',
     modules: [
-      { id: 'dashboard', name: 'لوحة التحكم', icon: 'layout-dashboard', status: 'designed',
-        value: 'ملخص يومي للمدير: الطلبات المعلقة، والحضور الأسبوعي، ومواقيت الصلاة في مدينة المنشأة.' },
       { id: 'performance', name: 'الأداء', icon: 'target', status: 'designed',
-        value: 'تقييمات الموظفين ومهاراتهم، مع صفحة للأداء الفردي وأخرى للأهداف (OKRs).' },
+        value: 'تقييمات الموظفين ومهاراتهم، مع صفحة للأداء الفردي وأخرى للأهداف (OKRs).',
+        ai: 'تحليل وشرح مصمَّمان' },
       { id: 'reports', name: 'التقارير', icon: 'chart-column-increasing', status: 'designed',
-        value: 'تقارير تفصيلية وتحليلات للحضور والتأخير والموظفين، قابلة للتصدير.' },
+        value: 'تقارير تفصيلية وتحليلات للحضور والتأخير والموظفين، قابلة للتصدير.',
+        ai: 'تحليل مصمَّم' },
     ],
   },
   {
@@ -197,8 +233,6 @@ export const MODULE_GROUPS: readonly ModuleGroup[] = [
     modules: [
       { id: 'settings', name: 'الإعدادات', icon: 'settings', status: 'designed',
         value: 'معلومات الشركة، وصلاحيات المستخدمين، وسياسات الإجازات، وإعداد الرواتب وطرق الدفع.' },
-      { id: 'assistant', name: 'المساعد الذكي', icon: 'sparkles', status: 'designed',
-        value: 'صفحة محادثة وإجراءات سريعة وسجل نشاط. مصمَّمة وموثَّقة، ولا يعمل فيها ذكاء اصطناعي في الديمو.' },
     ],
   },
 ];
@@ -267,7 +301,7 @@ export const SHOTS: readonly ProductShot[] = [
 export const DESIGN_SYSTEM = {
   kicker: 'نظام التصميم',
   title: 'من زر «موافقة» إلى كل وحدة قادمة، بنفس النظام',
-  body: 'الوحدات الأربع عشرة مبنية بالمكوّنات والرموز نفسها، فأي وحدة جديدة أو تعديل للهوية يبدأ من النظام، لا من كل شاشة على حدة.',
+  body: 'مجالات الموارد البشرية المصمَّمة مبنية بالمكوّنات والرموز نفسها، فأي وحدة جديدة أو تعديل للهوية يبدأ من النظام، لا من كل شاشة على حدة.',
   colorsTitle: 'ألوان دلالية',
   typeTitle: 'طباعة عربية — Tajawal',
   spacingTitle: 'مقياس المسافات',
@@ -282,7 +316,8 @@ export const DESIGN_SYSTEM = {
   ],
   foundationTitle: 'الأساس',
   foundation: 'مكتبة مكوّنات في Figma مبنية على أسس shadcn/ui، بمتغيرات للألوان والمسافات والزوايا والشبكة.',
-  handoffTitle: 'ما يستلمه فريق التطوير',
+  handoffTitle: 'ما قد يتضمنه التسليم لفريق التطوير',
+  handoffNote: 'وفق محتويات الباقة والترخيص المعتمد.',
   handoff: [
     'متغيرات Figma للألوان والمسافات والزوايا والشبكة',
     'مكتبة مكوّنات بحالاتها وصفحة لنظام التصميم',
@@ -296,16 +331,16 @@ export const DESIGN_SYSTEM = {
 export type AiShotId = 'assistant' | 'report' | 'financial';
 
 /** Real Figma frames (page `web app`). All are designs with sample data; nothing here runs. */
-export const AI_SHOTS: readonly { readonly id: AiShotId; readonly tab: string; readonly node: string; readonly title: string; readonly body: string; readonly alt: string; readonly w: number; readonly h: number }[] = [
-  { id: 'assistant', tab: 'المساعد الذكي', node: '1213:33188', w: 1200, h: 252,
+export const AI_SHOTS: readonly { readonly id: AiShotId; readonly tab: string; readonly title: string; readonly body: string; readonly alt: string; readonly w: number; readonly h: number }[] = [
+  { id: 'assistant', tab: 'المساعد الذكي', w: 1200, h: 252,
     title: 'مساعد داخل المنتج، لا نافذة دردشة منفصلة',
     body: 'إجراءات سريعة للإجازة والحضور والرواتب، وبطاقات بسياق الموظف بجانب المحادثة.',
     alt: 'جزء من صفحة المساعد الذكي في ملف التصميم: إجراءات سريعة للإجازة والحضور والرواتب، وبطاقات رصيد الإجازة وآخر حضور وموعد الراتب والطلبات المعلقة، ورأس نافذة المحادثة' },
-  { id: 'report', tab: 'تحليل التقارير', node: '1771:33760', w: 800, h: 520,
+  { id: 'report', tab: 'تحليل التقارير', w: 800, h: 520,
     title: 'زر «تحليل» بجانب التقرير',
     body: 'ملخص، وأبرز الملاحظات، وتوصية واحدة، مع تنبيه بأن التحليل إرشادي ولا يمثّل قرارًا إداريًا.',
     alt: 'نافذة تحليل تقرير الحضور والانصراف من ملف التصميم: تنبيه بأن التحليل إرشادي، وملخص الحضور مع مؤشر دائري، وأبرز الملاحظات' },
-  { id: 'financial', tab: 'الصحة المالية', node: '1743:32590', w: 818, h: 500,
+  { id: 'financial', tab: 'الصحة المالية', w: 818, h: 500,
     title: 'ملخص مالي للموظف بلغة بسيطة',
     body: 'مؤشر للصحة المالية ومعدل الادخار في جمل قصيرة، مع تنبيه بأن النتائج تتأثر باكتمال البيانات.',
     alt: 'نافذة التحليل الذكي للصحة المالية من ملف التصميم: تنبيه بأن النتائج قد تختلف حسب اكتمال البيانات، وملخص مالي مع مؤشر دائري من مئة' },
@@ -322,18 +357,60 @@ export const AI_SPACE = {
 } as const;
 
 /**
- * Prompt Toolkit: marketing description only (owner decision, 2026-11-14).
+ * The five designed AI use cases (Commercial V1, 2026-11-15). Each one is traceable to a Figma AI Specs frame
+ * in the working file (FW 1042:16650 · Performance 1081:32765 · Reports 1196:20556) and to one detailed row of the
+ * Notion «HR Prompt Toolkit – Use Cases» database. Public copy only: no action IDs, no prompt text, no data bindings
+ * (those live in the private register and the protected Buyer Edition). Designed and documented; none runs in the demo.
+ */
+export type AiUseCaseKind = 'dynamic' | 'educational';
+
+export const AI_USE_CASES = {
+  title: 'خمس حالات استخدام مصمَّمة',
+  body: 'كل حالة لها شاشة في ملف التصميم ومواصفة مكتوبة تحدد مدخلاتها وحدود ناتجها.',
+  status: 'مصمَّمة وموثَّقة · لا تعمل في الديمو',
+  groups: [
+    { kind: 'dynamic', title: 'تحليل بالبيانات',
+      body: 'يقرأ بيانات الشاشة المتاحة، ويعرض توجيهًا عامًا إن لم تكفِ البيانات. الناتج إرشادي، لا قرار إداري.',
+      items: [
+        { id: 'fw-overview', domain: 'الصحة المالية', title: 'نظرة عامة على الوضع المالي',
+          body: 'ملخص قصير وأبرز الملاحظات ونصيحة عملية واحدة.' },
+        { id: 'performance-overview', domain: 'الأداء', title: 'نظرة عامة على الأداء',
+          body: 'ملخص للتقييمات وأبرز الملاحظات وتوصية تطوير واحدة.' },
+        { id: 'report-overview', domain: 'التقارير', title: 'نظرة عامة على التقرير',
+          body: 'ملخص التقرير وملاحظة لافتة وتوصية واحدة، حسب الفترة والفلاتر.' },
+      ] },
+    { kind: 'educational', title: 'شرح تعليمي',
+      body: 'شرح ثابت للمفهوم، متاح دائمًا، ولا يستخدم بيانات الموظف ولا يقدّم توصيات.',
+      items: [
+        { id: 'fw-saving', domain: 'الصحة المالية', title: 'شرح معدل الادخار',
+          body: 'معناه وطريقة حسابه وكيف تُقرأ نطاقاته.' },
+        { id: 'performance-score', domain: 'الأداء', title: 'شرح درجة الأداء',
+          body: 'ما تمثّله الدرجة وكيف تُحسب وكيف تُقرأ نطاقاتها.' },
+      ] },
+  ] satisfies readonly { kind: AiUseCaseKind; title: string; body: string; items: readonly { id: string; domain: string; title: string; body: string }[] }[],
+} as const;
+
+/**
+ * Prompt Toolkit: marketing description only (owner decisions, 2026-11-14 and 2026-11-15).
  * The Toolkit is a protected paid asset, so the page shows its value and nothing of its content:
- * no field names, no example spec, no template or mapping. The complete Toolkit stays in the
- * protected source location and is delivered with the paid package.
+ * no field names, no example spec, no template or mapping. The full templates are prepared privately as a
+ * licensed Buyer Edition whose final inventory and licence are still pending owner acceptance, so no copy here
+ * promises delivery unconditionally.
  */
 export const TOOLKIT = {
   title: 'منظومة القوالب (Prompt Toolkit)',
-  body: 'كل تحليل مبني على قالب موثَّق، فيبقى الناتج متّسقًا ويمكن مراجعته وتطويره.',
+  body: 'كل حالة استخدام مبنية على قالب موثَّق يحدد نوعها، وحدود ناتجها، وما يُعرض حين تنقص البيانات.',
   benefitsLabel: 'ما تضيفه المنظومة',
   benefits: ['ناتج متّسق', 'قابل للمراجعة', 'قابل للتطوير'],
   specsCount: 5,
-  specsNote: 'خمس حالات استخدام موثَّقة للتقارير والأداء والصحة المالية. القوالب نفسها تُسلَّم ضمن الحزمة ولا تُعرض هنا.',
+  editionsLabel: 'ثلاث طبقات منفصلة',
+  editions: [
+    { id: 'public', title: 'معاينة عامة', body: 'ما تراه في هذه الصفحة: وصف الحالات دون نصوص القوالب.' },
+    { id: 'buyer', title: 'نسخة المشتري', body: 'نصوص القوالب الخمسة ومواصفاتها، تتوفر بعد اعتماد محتواها وترخيصها.' },
+    { id: 'internal', title: 'المصادر الداخلية', body: 'نسخ العمل الأصلية، تبقى محمية ولا تُسلَّم.' },
+  ],
+  specsNote: 'نصوص القوالب لا تُعرض هنا، ولا تعمل داخل الديمو.',
+  inquiry: 'استفسر عن ترخيص منظومة القوالب',
 } as const;
 
 /* ------------------------------------------------------------------ Architecture & reference blueprints */
@@ -344,7 +421,7 @@ export const TOOLKIT = {
  * Buyer-only material (ERDs, authority matrix, mappings, contracts, acceptance scenarios) is named, never shown.
  */
 export const ARCHITECTURE = {
-  kicker: 'البنية والتكامل',
+  kicker: 'خرائط البيانات والتكامل',
   title: 'كيف تُدار الإجازات إذا كان لدى العميل نظام موارد بشرية بالفعل؟',
   body: 'يوثّق مخطط كوادرنا خيارين: إدارة الإجازات بشكل مستقل، أو تصميمها لتعمل إلى جانب نظام الموارد البشرية لدى العميل. ويساعد فرق البرمجيات على تحديد مصدر بيانات الموظفين والجهة المسؤولة عن قرارات الإجازة قبل تقدير نطاق التنفيذ.',
   modes: [
@@ -356,9 +433,17 @@ export const ARCHITECTURE = {
       owners: [{ system: 'نظام الموارد البشرية القائم', owns: 'سجلات الموظفين' }, { system: 'كوادرنا', owns: 'قرارات الإجازة' }],
       caption: 'مثال لتوزيع المسؤوليات' },
   ],
+  track: {
+    label: 'مسار تصميمي مستقل',
+    purpose: 'يساعد فريقك على تحديد مصدر بيانات الموظف، والجهة المسؤولة عن كل قرار، وكيف تنتقل البيانات بين كوادرنا وأي نظام قائم قبل بدء التنفيذ.',
+    value: 'قيمته لك: قرارات معمارية أوضح، وتقدير أدق للنطاق، وأساس لتصميم واجهات الربط والمطابقة.',
+    existing: { title: 'موجود الآن', body: 'وثائق بنية مرجعية ودراسات تكامل، وإطارات تصميم أصلية لخرائط البيانات والتكامل في ملف Figma.' },
+    pending: { title: 'قيد الاعتماد النهائي', body: 'اكتمال تصاميم واجهات هذا المسار ومجموعات مكوّناتها، وما سيُدرج منها في الباقة، يُحدَّد بعد مراجعة ملف التصميم.' },
+  },
+  providerNote: 'أسماء الأنظمة مراجع توثيقية فقط، ولا تعني شراكة تجارية أو توافقًا معتمدًا.',
   studiesLabel: 'دراسات مرجعية',
   studies: 'دراسات مرجعية لأنظمة Odoo وجسر و ZenHR، ودراسة لتصميم امتداد مؤسسي لنظام SAP SuccessFactors.',
-  docsTitle: 'ما يستلمه فريق التطوير',
+  docsTitle: 'ما قد يتضمنه التسليم لفريق التطوير',
   docs: [
     'المتطلبات وحدود النطاق',
     'نموذج البيانات المنطقي',
@@ -367,7 +452,7 @@ export const ARCHITECTURE = {
     'عقود طبقة الربط وحزم العمل وسيناريوهات القبول',
     'نتائج المراجعة وحدود التحقق',
   ],
-  docsNote: 'تُسلَّم للمشتري ضمن الحزمة، ولا تُعرض محتوياتها هنا.',
+  docsNote: 'وفق محتويات الباقة والترخيص المعتمد، ولا تُعرض محتوياتها هنا.',
   boundary: 'هذه وثائق بنية مرجعية ودراسات تكامل. موصّلات API الفعلية وقواعد بيانات الإنتاج والربط بالأنظمة غير منفَّذة، وتقييم بيئة المنشأة يحدد العمليات الممكنة.',
 } as const;
 
@@ -452,21 +537,27 @@ export const AUDIENCES = [
 export type DeliverableClass = 'figma' | 'system' | 'ai' | 'blueprint' | 'demo';
 
 export const PACKAGE = {
-  kicker: 'ما تحصل عليه',
-  title: 'حزمة تصميم كاملة، وكل جزء موصوف كما هو',
+  kicker: 'محتوى الباقة',
+  title: 'ما تتضمنه الحزمة، وكل جزء موصوف كما هو',
   audienceLabel: 'لمن هذا المشروع',
   groups: [
     { id: 'figma', label: 'تصميم Figma',
-      items: ['صفحة ديسكتوب لكل وحدة من الوحدات الأربع عشرة', 'شاشات جوال للموظف والمدير'] },
+      items: ['تصاميم Figma لمجالات إدارة الموارد البشرية، ولوحة التحكم كواجهة دخول', 'شاشات جوال للموظف والمدير'] },
     { id: 'system', label: 'نظام التصميم',
       items: ['متغيرات الألوان والمسافات والزوايا والشبكة', 'مكتبة مكوّنات بحالاتها'] },
     { id: 'ai', label: 'أصول الذكاء الاصطناعي',
-      items: ['تصاميم المساعد ونوافذ التحليل', 'مواصفات خمس حالات استخدام وهيكل منظومة القوالب'] },
-    { id: 'blueprint', label: 'مخططات مرجعية',
-      items: ['التشغيل المستقل والتشغيل مع نظام قائم', 'نموذج البيانات والدراسات المرجعية'] },
+      items: [
+        'تصاميم المساعد ونوافذ التحليل في Figma',
+        'مواصفات حالات الاستخدام الخمس في ملف التصميم',
+        'نسخة المشتري من منظومة القوالب: مُعدَّة للترخيص، ويُثبَّت محتواها في اتفاقية الترخيص',
+      ] },
+    { id: 'blueprint', label: 'خرائط البيانات والتكامل',
+      items: ['التشغيل المستقل والتشغيل مع نظام قائم', 'نموذج البيانات والدراسات المرجعية', 'تصاميم الواجهات النهائية لهذا المسار: تُحدَّد بعد الاعتماد'] },
     { id: 'demo', label: 'يعمل في الديمو',
-      items: ['رحلة الإجازة بين المدير والموارد البشرية', 'كود الديمو واختباراته ومواصفات كل مرحلة'] },
+      items: ['رحلة الإجازة بين الموظف والمدير والموارد البشرية', 'كود الديمو واختباراته ومواصفات كل مرحلة'] },
   ] satisfies readonly { id: DeliverableClass; label: string; items: readonly string[] }[],
+  /** The Commercial V1 package has not completed final commercial acceptance (2026-11-15). */
+  release: 'تتوفر أصول التطوير والقوالب المتخصصة وفق محتويات الباقة والترخيص المعتمد.',
   licensing: 'الترخيص ونقل الملكية يُتفق عليهما مع مالك المشروع مباشرة.',
   licensingLink: 'تواصل مع المالك',
   excludedLabel: 'غير مشمول',
@@ -475,6 +566,7 @@ export const PACKAGE = {
     'مصادقة حقيقية وإدارة مستخدمين',
     'ذكاء اصطناعي عامل أو ربط بنموذج',
     'موصّلات API فعلية بأنظمة أخرى',
+    'نسخ العمل الداخلية والتصاميم غير المكتملة',
     'تحقق نظامي أو شهادات',
   ],
 } as const;
@@ -483,20 +575,28 @@ export const FAQ = {
   kicker: 'أسئلة المشترين',
   title: 'قبل أن تقرّر',
   items: [
-    { q: 'ما الذي أشتريه تحديدًا؟',
-      a: 'مشروع تصميم: ملف Figma لأربع عشرة وحدة ونظام تصميمها، وأصول ذكاء اصطناعي موثَّقة، ومخططات مرجعية، وديمو React لرحلة الإجازة.' },
+    { q: 'ما هو كوادرنا، وما الذي أشتريه تحديدًا؟',
+      a: 'أساس تصميم وتطوير لمنصات الموارد البشرية العربية: Figma ونظام تصميم ومواصفات ذكاء اصطناعي ومراجع معمارية وديمو، وفق الباقة المعتمدة.' },
     { q: 'هل كوادرنا منتج جاهز للتشغيل؟',
-      a: 'لا. هو تصميم مع ديمو محدود ببيانات وحسابات افتراضية، دون مصادقة حقيقية أو خادم أو قاعدة بيانات إنتاج.' },
+      a: 'لا. لا خادم ولا قاعدة بيانات إنتاج ولا مصادقة حقيقية، ولا موصّلات API أو ذكاء اصطناعي عامل. الديمو محدود ببيانات افتراضية.' },
     { q: 'ما الذي يعمل في الديمو؟',
-      a: 'رحلة طلب الإجازة بين المدير والموارد البشرية. بقية الوحدات تظهر في التنقل وتوضّح أنها خارج نطاق التجربة.' },
+      a: 'رحلة طلب الإجازة بين الموظف والمدير والموارد البشرية. بقية الوحدات تظهر في التنقل وتوضّح أنها خارج نطاق التجربة.' },
     { q: 'هل الذكاء الاصطناعي يعمل؟',
-      a: 'لا. المساعد ونوافذ التحليل مصمَّمة، ولكل تحليل مواصفة مكتوبة. الربط بنموذج ذكاء اصطناعي جزء من التنفيذ.' },
+      a: 'لا. المساعد ونوافذ التحليل مصمَّمة، ولكل حالة مواصفة مكتوبة. لا يعمل أي قالب في الديمو، والربط بنموذج جزء من التنفيذ.' },
+    { q: 'ما حالات الاستخدام الخمس المصمَّمة؟',
+      a: 'ثلاثة تحليلات بالبيانات للصحة المالية والأداء والتقارير، وشرحان تعليميان لمعدل الادخار ودرجة الأداء.' },
+    { q: 'ما علاقة مواصفات التصميم بمنظومة القوالب؟',
+      a: 'لكل مواصفة في ملف التصميم قالب موثَّق يقابلها. المواصفة تصف الشاشة والسلوك، والقالب يصف ما يُطلب من النموذج.' },
+    { q: 'هل تُسلَّم القوالب كاملة؟',
+      a: 'نصوص القوالب الخمسة مُعدَّة كنسخة مشترٍ مرخَّصة، وتُسلَّم بعد اعتماد محتواها في اتفاقية الترخيص. نسخ العمل الداخلية لا تُسلَّم.' },
     { q: 'هل يعمل مع Odoo أو جسر أو ZenHR؟',
       a: 'الحزمة تتضمن دراسات مرجعية لها، ودراسة لتصميم امتداد مؤسسي لنظام SAP SuccessFactors. لا توجد موصّلات منفَّذة، والتنفيذ يتطلب بيئة المشتري.' },
     { q: 'هل يمكن تخصيص التصميم لهويتنا؟',
       a: 'النظام مبني على رموز دلالية، فتغيير الألوان أو الطباعة يتم من مستوى الرموز. حجم التخصيص يُقدَّر عند الاطلاع على الملف.' },
-    { q: 'ماذا يستلم فريق التطوير؟',
-      a: 'متغيرات Figma ومكتبة المكوّنات، ومواصفات الإجازة بمعايير قبول، وكود الديمو بالاختبارات، والمخططات المرجعية.' },
+    { q: 'ماذا قد يستلم فريق التطوير؟',
+      a: 'وفق الباقة المعتمدة: متغيرات Figma ومكتبة المكوّنات، ومواصفات الإجازة، وكود الديمو باختباراته، والمراجع المعمارية.' },
+    { q: 'ما وضع مسار خرائط البيانات والتكامل؟',
+      a: 'مراجع معمارية ودراسات موجودة الآن. اكتمال تصاميمه النهائية يُحسم بعد اعتماد ملف التصميم، ولا توجد موصّلات منفَّذة.' },
     { q: 'ماذا عن المتطلبات النظامية في السعودية؟',
       a: 'لا نقدّم أي ادعاء بالمطابقة النظامية. التحقق يتم أثناء التنفيذ مع مختصين.' },
     { q: 'كيف أستفسر عن الشراء أو الترخيص؟',
@@ -505,10 +605,8 @@ export const FAQ = {
 } as const;
 
 export const FINAL = {
-  title: 'حزمة تصميم كاملة، وجزء منها يعمل الآن',
-  /** Label for the purchase-inquiry link (default `contactHref` = CREATOR.inquiryHref, the owner mailto). */
-  contact: 'استفسر عن الشراء',
-  body: 'جرّب رحلة الإجازة كمدير ثم كموارد بشرية، وراجع ما تتضمنه الحزمة قبل أن تقرّر.',
+  title: 'ابدأ بتجربة الرحلة، ثم استفسر عن الباقة',
+  body: 'جرّب رحلة الإجازة كمدير ثم كموارد بشرية، ثم استفسر عن محتوى الباقة والترخيص.',
   note: 'حسابات وبيانات افتراضية — لا حاجة لإنشاء حساب.',
 } as const;
 

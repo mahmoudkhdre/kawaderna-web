@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { ArrowUpLeft, Check, CircleCheck, CircleSlash, TriangleAlert, X } from 'lucide-react';
+import { ArrowUpLeft, Check, CircleCheck, CircleSlash, Sparkles, TriangleAlert, X } from 'lucide-react';
 import {
   AUDIENCES, CASE_STUDY, CREATOR, CTA, DESIGN_SYSTEM, ECOSYSTEM, GROUP_SHOTS, JOURNEY, JOURNEY_AVAILABILITY_LABEL, MODULE_GROUPS, PACKAGE,
   PROCESS, REGION, SHOTS, SPACING_SCALE, STATUS_LABEL, SWATCHES, TYPE_SCALE, VISION,
 } from '../content';
 import type { ModuleStatus } from '../content';
-import { unitCount } from '../format';
 import { DemoLink, ModuleIcon, Reveal, SectionHeading } from './primitives';
 import { useTabKeys } from './Tabs';
 import inboxM from '../assets/manager-inbox-m.jpg';
@@ -81,10 +80,9 @@ export const Ecosystem = () => {
               <button key={g.id} ref={register(i)} type="button" role="tab" id={`ld-tab-${g.id}`}
                 aria-selected={active === i} aria-controls={`ld-panel-${g.id}`} tabIndex={active === i ? 0 : -1}
                 className="ld-eco__tab" onClick={() => setActive(i)} onKeyDown={onKeyDown} data-group-tab={g.id}>
-                <span className="ld-eco__tab-num" aria-hidden="true">{toArabic(g.modules.length)}</span>
+                <span className="ld-eco__tab-num" aria-hidden="true">{toArabic(i + 1)}</span>
                 <span className="ld-eco__tab-text">
                   <span className="ld-eco__tab-title">{g.title}</span>
-                  <span className="ld-eco__tab-count">{unitCount(g.modules.length)}</span>
                 </span>
               </button>
             ))}
@@ -112,12 +110,26 @@ export const Ecosystem = () => {
                       </div>
                       <p className="ld-module__value">{m.value}</p>
                       {m.evidence && <p className="ld-module__evidence">{m.evidence}</p>}
+                      {m.ai && (
+                        <a className="ld-module__ai" href="#ai" data-module-ai={m.id}>
+                          <Sparkles size={16} strokeWidth={1.5} aria-hidden="true" />
+                          {m.ai} في مساحة الذكاء الاصطناعي
+                        </a>
+                      )}
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
+        </div>
+        <div className="ld-eco__layers" data-eco-layers>
+          <p className="ld-eco__layers-label">{ECOSYSTEM.layersLabel}</p>
+          <ul>
+            {ECOSYSTEM.layers.map(l => (
+              <li key={l.id} data-layer={l.id}><strong>{l.title}</strong> {l.body}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
@@ -172,7 +184,7 @@ export const Journey = ({ demoHref, onStartDemo }: { demoHref: string; onStartDe
             <div className="ld-viewer__text">
               <h3 className="ld-h4">{shot.title}</h3>
               <p>{shot.body}</p>
-              <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.primary} placement="journey" />
+              <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.secondary} variant="ghost" placement="journey" />
               <p className="ld-viewer__caption">لقطة حقيقية من الديمو العامل · بيانات افتراضية</p>
             </div>
             <div className={`ld-viewer__stage${shot.desktopAlt ? ' ld-viewer__stage--desk' : ''}`}>
@@ -264,6 +276,7 @@ export const DesignSystemShowcase = () => (
           <div className="ld-handoff__list" data-handoff="true">
             <h3 className="ld-tile__title">{DESIGN_SYSTEM.handoffTitle}</h3>
             <ul>{DESIGN_SYSTEM.handoff.map(h => <li key={h}><Check size={16} strokeWidth={1.5} aria-hidden="true" />{h}</li>)}</ul>
+            <p className="ld-handoff__note">{DESIGN_SYSTEM.handoffNote}</p>
           </div>
         </Reveal>
       </div>
@@ -297,7 +310,7 @@ export const Package = () => (
         </Reveal>
       </div>
       <p className="ld-package__licensing" data-licensing="true">
-        {PACKAGE.licensing} <a className="ld-textlink" href="#creator">{PACKAGE.licensingLink}</a>
+        <span data-package-release="true">{PACKAGE.release}</span> {PACKAGE.licensing} <a className="ld-textlink" href="#creator">{PACKAGE.licensingLink}</a>
       </p>
       <p className="ld-disclaimer" data-compliance-disclaimer="true">{REGION.disclaimer}</p>
     </div>

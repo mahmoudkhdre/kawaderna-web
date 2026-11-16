@@ -1,6 +1,5 @@
-import { ArrowDown, Check } from 'lucide-react';
-import { CTA, HERO } from '../content';
-import { DemoLink } from './primitives';
+import { CTA, HERO, VALUE } from '../content';
+import { DemoLink, InquiryLink, ModuleIcon } from './primitives';
 import dashboardImg from '../assets/figma-dashboard.jpg';
 import employeeImg from '../assets/figma-employee-m.jpg';
 
@@ -25,7 +24,26 @@ const ProductStage = () => (
   </figure>
 );
 
-export const Hero = ({ demoHref, onStartDemo }: { demoHref: string; onStartDemo?: () => void }) => (
+/** Commercial value near the hero: seven areas, each with a non-colour-only state (filled vs hollow marker + text). */
+const ValueOverview = () => (
+  <div className="ld-value" data-value-overview="true" role="group" aria-labelledby="ld-value-title">
+    <div className="ld-value__head">
+      <h2 id="ld-value-title" className="ld-value__title">{VALUE.label}</h2>
+    </div>
+    <ul className="ld-value__grid">
+      {VALUE.items.map(it => (
+        <li key={it.id} className="ld-value__item" data-value-item={it.id} data-value-state={it.state}>
+          <span className="ld-value__icon"><ModuleIcon name={it.icon} size={20} /></span>
+          <h3 className="ld-value__item-title">{it.title}</h3>
+          <p>{it.body}</p>
+          <span className={`ld-value__chip ld-value__chip--${it.state}`}>{VALUE.legend[it.state]}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
+export const Hero = ({ demoHref, onStartDemo, contactHref }: { demoHref: string; onStartDemo?: () => void; contactHref: string }) => (
   <section className="ld-hero" aria-labelledby="ld-hero-title">
     <div className="ld-container ld-hero__inner">
       <div className="ld-hero__copy">
@@ -35,25 +53,13 @@ export const Hero = ({ demoHref, onStartDemo }: { demoHref: string; onStartDemo?
         </h1>
         <p className="ld-hero__lede">{HERO.lede}</p>
         <div className="ld-hero__actions">
-          <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.primary} size="lg" placement="hero" />
-          <a className="ld-btn ld-btn--ghost ld-btn--lg" href="#package">
-            <span>{CTA.secondary}</span>
-            <ArrowDown size={18} aria-hidden="true" strokeWidth={1.5} />
-          </a>
+          <InquiryLink href={contactHref} label={CTA.primary} size="lg" placement="hero" />
+          <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.secondary} variant="ghost" size="lg" placement="hero" />
         </div>
+        <p className="ld-hero__note">{HERO.note}</p>
       </div>
       <ProductStage />
-      <div className="ld-deliver" data-hero-deliverables="true">
-        <p className="ld-deliver__label">{HERO.deliverablesLabel}</p>
-        <ul className="ld-deliver__stats">
-          {HERO.stats.map(d => (
-            <li key={d.label}><strong>{d.value}</strong><span>{d.label}</span></li>
-          ))}
-        </ul>
-        <ul className="ld-deliver__list">
-          {HERO.deliverables.map(d => <li key={d}><Check size={16} strokeWidth={1.5} aria-hidden="true" />{d}</li>)}
-        </ul>
-      </div>
+      <ValueOverview />
     </div>
   </section>
 );

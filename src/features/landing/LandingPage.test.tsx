@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { LandingPage } from './index';
-import { AI_SHOTS, ARCHITECTURE, CASE_STUDY, CREATOR, CTA, FAQ, FOOTER, JOURNEY, MODULE_GROUPS, NAV_LINKS, PACKAGE, SWATCHES, TOOLKIT } from './content';
+import { AI_SHOTS, AI_SPACE, AI_USE_CASES, ARCHITECTURE, ECOSYSTEM, CASE_STUDY, CREATOR, CTA, FAQ, FOOTER, HERO, JOURNEY, MODULE_GROUPS, NAV_LINKS, PACKAGE, SWATCHES, TOOLKIT, VALUE } from './content';
 import { unitCount } from './format';
 
 const html = renderToStaticMarkup(<LandingPage />);
@@ -27,11 +27,24 @@ describe('Landing page — structure and CTA contract', () => {
     expect(html).toContain('aria-label="التبديل إلى الوضع الداكن"');
   });
 
-  it('every demo CTA uses the approved label and the default demo entry `/`', () => {
+  it('every demo CTA is the secondary action «جرّب الديمو» and uses the default demo entry `/`', () => {
     const ctas = [...html.matchAll(/<a [^>]*data-demo-cta="([^"]+)"[^>]*>/g)];
     expect(ctas.map(m => m[1]).sort()).toEqual(['final', 'hero', 'journey', 'mobile-menu', 'nav']);
-    for (const [tag] of ctas) expect(tag).toContain('href="/"');
-    expect(text.split(CTA.primary).length - 1).toBe(5);
+    for (const [tag] of ctas) { expect(tag).toContain('href="/"'); expect(tag).not.toContain('ld-btn--primary'); }
+    expect(CTA.secondary).toBe('جرّب الديمو');
+    expect(text.split(CTA.secondary).length - 1).toBe(5);
+  });
+
+  it('every inquiry CTA is the primary action «استفسر عن شراء الحزمة» and points to the owner mailto, with no checkout', () => {
+    const ctas = [...html.matchAll(/<a [^>]*data-contact-cta="([^"]+)"[^>]*>/g)];
+    expect(ctas.map(m => m[1]).sort()).toEqual(['final', 'hero', 'mobile-menu', 'nav']);
+    for (const [tag] of ctas) expect(tag).toContain(`href="${CREATOR.inquiryHref.replace(/&/g, '&amp;')}"`);
+    expect(CTA.primary).toBe('استفسر عن شراء الحزمة');
+    expect(text.split(CTA.primary).length - 1).toBe(4);
+    const hero = html.slice(html.indexOf('class="ld-hero__actions"'), html.indexOf('</div>', html.indexOf('class="ld-hero__actions"')));
+    expect(hero.indexOf('data-contact-cta="hero"')).toBeLessThan(hero.indexOf('data-demo-cta="hero"'));
+    expect(hero).toMatch(/data-contact-cta="hero"[^>]*>|ld-btn--primary/);
+    expect(html).not.toMatch(/checkout|اشترِ الآن|Buy Now|سعر الحزمة|\$\s?\d/i);
   });
 
   it('honours a custom demoHref from the integrator', () => {
@@ -85,11 +98,30 @@ describe('Landing page — sections', () => {
     for (const link of NAV_LINKS) expect(html).toContain(`id="${link.href.slice(1)}"`);
   });
 
-  it('the ecosystem lists all 14 modules in four groups, with no duplicated demo thumbnail', () => {
+  it('the ecosystem lists every module name in four groups, states no total or per-group count, and has no duplicated demo thumbnail', () => {
     const eco = html.slice(html.indexOf('id="ecosystem"'), html.indexOf('id="ai"'));
-    expect(eco.match(/data-module="/g)).toHaveLength(14);
+    expect(eco.match(/data-module="/g)).toHaveLength(MODULE_GROUPS.flatMap(g => g.modules).length);
     expect(eco.match(/data-group-tab="/g)).toHaveLength(4);
+    expect(eco).not.toContain('ld-eco__tab-count');
     expect(eco.match(/ld-module__thumb/g)).toBeNull();
+    expect(ECOSYSTEM.title).toBe('مجموعة متكاملة من مجالات إدارة الموارد البشرية المصمَّمة');
+  });
+
+  it('Dashboard, AI assistant and the admin design tracks are not counted as core domains, but stay discoverable', () => {
+    const ids = MODULE_GROUPS.flatMap(g => g.modules).map(m => m.id);
+    expect(ids).not.toContain('dashboard');
+    expect(ids).not.toContain('assistant');
+    const eco = html.slice(html.indexOf('id="ecosystem"'), html.indexOf('id="ai"'));
+    expect(eco.match(/data-layer="/g)).toHaveLength(3);
+    expect(eco).toContain('لوحة التحكم');
+    expect(html).toContain('id="ai"');
+    expect(AI_SHOTS.map(s => s.id)).toContain('assistant');
+  });
+
+  it('no visible text states a total module count (14, 26 or 12): the final inventory is not accepted yet', () => {
+    const flat = text.replace(/\s+/g, ' ');
+    expect(flat).not.toMatch(/١٤|\b14\b|أربع عشرة|الأربع عشرة|٢٦|\b26\b|ست وعشرين|١٢|\b12\b|اثنا عشر|اثني عشر|الاثنا عشر|الاثني عشر/);
+    expect(flat).not.toMatch(/(\d|[٠-٩])+\s*(وحدة|وحدات|مجال|مجالًا|مجالات)\s*(أساسية|أساسيًا|مصمَّمة)/);
   });
 
   it('keeps copy short: no module description or FAQ answer runs past 160 characters', () => {
@@ -99,13 +131,11 @@ describe('Landing page — sections', () => {
 });
 
 describe('Landing page — commercial integrity', () => {
-  it('only Leave is marked as working in the demo; the AI assistant is a designed page, not a working feature', () => {
+  it('only Leave is marked as working in the demo; the AI is a designed space, not a working feature', () => {
     const all = MODULE_GROUPS.flatMap(g => g.modules);
-    expect(all).toHaveLength(14);
     expect(all.filter(m => m.status === 'demo').map(m => m.id)).toEqual(['leave']);
-    expect(all.find(m => m.id === 'assistant')?.status).toBe('designed');
-    expect(all.find(m => m.id === 'assistant')?.value).toContain('لا يعمل فيها ذكاء اصطناعي');
     expect(new Set(all.map(m => m.id)).size).toBe(all.length);
+    expect(AI_SPACE.status).toContain('غير متصل بنموذج ذكاء اصطناعي');
   });
 
   it('the Employee step is labelled available now that the Employee → Manager → HR journey is verified end to end', () => {
@@ -170,12 +200,13 @@ describe('Landing page — commercial integrity', () => {
   });
 
   it('activates the purchase inquiry with the owner mailto by default, and lets the host override it', () => {
-    const buttons = html.match(/<a [^>]*data-contact-cta="true"[^>]*>/g);
+    const buttons = html.match(/<a [^>]*data-contact-cta="final"[^>]*>/g);
     expect(buttons).toHaveLength(1);
     expect(buttons?.[0]).toContain(`href="${CREATOR.inquiryHref.replace(/&/g, '&amp;')}"`);
     expect(CREATOR.inquiryHref.startsWith('mailto:mahmoudkhdre9@gmail.com?subject=')).toBe(true);
     const withContact = renderToStaticMarkup(<LandingPage contactHref="https://example.test/inquiry" />);
-    expect(withContact.match(/<a [^>]*data-contact-cta="true"[^>]*>/g)).toHaveLength(1);
+    expect(withContact.match(/<a [^>]*data-contact-cta="[^"]+"[^>]*>/g)).toHaveLength(4);
+    for (const [tag] of withContact.matchAll(/<a [^>]*data-contact-cta="[^"]+"[^>]*>/g)) expect(tag).toContain('href="https://example.test/inquiry"');
     expect(withContact).toContain('href="https://example.test/inquiry"');
     // licensing, footer credit and navigation all lead to the single contact section, without repeating details
     expect(section('package')).toMatch(/data-licensing="true"[\s\S]*href="#creator"/);
@@ -186,9 +217,9 @@ describe('Landing page — commercial integrity', () => {
     expect(cs).toContain(`href="${CASE_STUDY.href}"`);
     expect(cs).toContain('rel="noopener noreferrer"');
     expect(CREATOR.channels.find(c => c.id === 'behance')?.href).toBe(CASE_STUDY.href);
-    // the demo stays the primary CTA in the final section
+    // the inquiry is the primary CTA in the final section and the demo is the secondary one
     const final = html.slice(html.indexOf('id="ld-final-title"'));
-    expect(final.indexOf('data-demo-cta="final"')).toBeLessThan(final.indexOf('data-contact-cta'));
+    expect(final.indexOf('data-contact-cta="final"')).toBeLessThan(final.indexOf('data-demo-cta="final"'));
   });
 });
 
@@ -209,11 +240,49 @@ describe('Stage 2C — complete project coverage', () => {
     expect(ai).toContain(TOOLKIT.body);
     for (const b of TOOLKIT.benefits) expect(ai).toContain(b);
     expect(TOOLKIT.specsCount).toBe(5);
-    expect(Object.keys(TOOLKIT).sort()).toEqual(['benefits', 'benefitsLabel', 'body', 'specsCount', 'specsNote', 'title']);
+    expect(Object.keys(TOOLKIT).sort()).toEqual(['benefits', 'benefitsLabel', 'body', 'editions', 'editionsLabel', 'inquiry', 'specsCount', 'specsNote', 'title']);
     for (const protectedText of [
       'HR_REPORT_OVERVIEW_INSIGHT', 'Case ID', 'Trigger', 'Context Source', 'Conditions', 'Fallback', 'Language', 'Tone',
       'data-toolkit-spec', 'ld-spec', 'زر «تحليل التقرير»',
     ]) expect(text, protectedText).not.toContain(protectedText);
+  });
+
+  it('AI Space lists exactly the five designed use cases, grouped 3 dynamic + 2 educational, marked as not running', () => {
+    const ai = section('ai');
+    expect(AI_USE_CASES.groups.map(g => [g.kind, g.items.length])).toEqual([['dynamic', 3], ['educational', 2]]);
+    const labels = AI_USE_CASES.groups.flatMap(g => g.items.map(i => i.title));
+    expect(labels).toEqual(['نظرة عامة على الوضع المالي', 'نظرة عامة على الأداء', 'نظرة عامة على التقرير', 'شرح معدل الادخار', 'شرح درجة الأداء']);
+    expect(ai.match(/data-usecase="/g)).toHaveLength(5);
+    expect(ai.match(/data-usecase-group="/g)).toHaveLength(2);
+    for (const l of labels) expect(ai).toContain(l);
+    expect(ai).toContain('لا تعمل في الديمو');
+    expect(labels.length).toBe(TOOLKIT.specsCount);
+    // existing AI tabs and images are unchanged
+    expect([...ai.matchAll(/data-ai-tab="([^"]+)"/g)].map(m => m[1])).toEqual(['assistant', 'report', 'financial']);
+  });
+
+  it('asset protection: no action IDs, prompt text, placeholders or internal bindings anywhere in the public page', () => {
+    for (const id of ['HR_FW_OVERVIEW_INSIGHT', 'HR_FW_SAVING_EXPLAIN', 'HR_PERFORMANCE_OVERVIEW_INSIGHT', 'HR_PERFORMANCE_SCORE_EXPLAIN', 'HR_REPORT_OVERVIEW_INSIGHT'])
+      expect(html).not.toContain(id);
+    expect(html).not.toMatch(/HR_[A-Z_]{4,}|\{\{|\}\}|System Instruction|\[Task\]|saving_rate|goals_progress|attendance_rate|You are an/);
+    expect(html).not.toMatch(/notion\.(so|com)|uE4G0jiXhcA65d6AxJljvO|3vNsjBj9Gen1HSrtKrjd13/);
+  });
+
+  it('Toolkit separates public preview, licensed buyer edition and protected internal sources, without an unconditional delivery promise', () => {
+    expect(TOOLKIT.editions.map(e => e.id)).toEqual(['public', 'buyer', 'internal']);
+    expect(TOOLKIT.editions.find(e => e.id === 'buyer')?.body).toContain('بعد اعتماد محتواها وترخيصها');
+    expect(TOOLKIT.editions.find(e => e.id === 'internal')?.body).toContain('لا تُسلَّم');
+    expect(TOOLKIT.specsNote).not.toMatch(/تُسلَّم ضمن الحزمة/);
+    const ai = section('ai');
+    expect(ai).toMatch(/data-ai-inquiry="true"[^>]*>|href="#creator"[^>]*data-ai-inquiry/);
+    expect(ai).not.toMatch(/data-demo-cta|data-contact-cta/); // one secondary text link to #creator, no duplicate buttons
+  });
+
+  it('Financial Wellness, Performance and Reports link to the AI Space as designed interactions; no other domain does', () => {
+    const eco = html.slice(html.indexOf('id="ecosystem"'), html.indexOf('id="ai"'));
+    expect([...eco.matchAll(/data-module-ai="([^"]+)"/g)].map(m => m[1])).toEqual(['financial-health', 'performance', 'reports']);
+    for (const a of eco.match(/<a [^>]*data-module-ai="[^"]+"[^>]*>/g) ?? []) expect(a).toContain('href="#ai"');
+    for (const m of MODULE_GROUPS.flatMap(g => g.modules).filter(m => m.ai)) expect(m.ai).toMatch(/مصمَّم/);
   });
 
   it('blueprints are reference documents in the package, with no temporary wording and no live-integration claim', () => {
@@ -252,7 +321,24 @@ describe('Stage 2C — complete project coverage', () => {
     expect(PACKAGE.groups.map(g => g.id)).toEqual(['figma', 'system', 'ai', 'blueprint', 'demo']);
     const pkg = section('package');
     expect(pkg).toContain('data-deliverable="excluded"');
-    for (const x of ['برنامج جاهز للتشغيل', 'ذكاء اصطناعي عامل', 'موصّلات API']) expect(pkg).toContain(x);
+    for (const x of ['برنامج جاهز للتشغيل', 'ذكاء اصطناعي عامل', 'موصّلات API', 'نسخ العمل الداخلية']) expect(pkg).toContain(x);
+    // AI deliverables are split into UI designs, the five specs and the conditional Buyer Edition
+    const ai = PACKAGE.groups.find(g => g.id === 'ai')?.items ?? [];
+    expect(ai).toHaveLength(3);
+    expect(ai[2]).toContain('اتفاقية الترخيص');
+    expect(pkg).toContain('data-package-release="true"');
+    expect(pkg).not.toMatch(/اشترِ الآن|Buy Now|سعر|checkout/i);
+  });
+
+  it('FAQ answers what a buyer needs about the five AI use cases, templates and exclusions', () => {
+    const qs = FAQ.items.map(i => i.q);
+    expect(qs).toContain('ما حالات الاستخدام الخمس المصمَّمة؟');
+    expect(qs).toContain('ما علاقة مواصفات التصميم بمنظومة القوالب؟');
+    const full = FAQ.items.find(i => i.q === 'هل تُسلَّم القوالب كاملة؟');
+    expect(full?.a).toContain('بعد اعتماد محتواها');
+    const notReady = FAQ.items.find(i => i.q.includes('جاهز للتشغيل'));
+    for (const x of ['خادم', 'مصادقة', 'API', 'ذكاء اصطناعي عامل']) expect(notReady?.a).toContain(x);
+    expect(FAQ.items.find(i => i.q.includes('يعمل في الديمو'))?.a).toContain('الموظف');
   });
 
   it('the process and buyer audiences are present', () => {
@@ -263,6 +349,70 @@ describe('Stage 2C — complete project coverage', () => {
   it('FAQ covers the AI, integration and developer-handoff questions', () => {
     const qs = FAQ.items.map(i => i.q).join(' ');
     for (const k of ['الذكاء الاصطناعي', 'Odoo', 'فريق التطوير', 'الترخيص']) expect(qs).toContain(k);
+  });
+});
+
+describe('Commercial V1 — positioning, value overview, license and Data Maps track', () => {
+  it('the hero states the approved product message and the audience, without production-SaaS, certification or speed claims', () => {
+    const h1 = html.slice(html.indexOf('<h1'), html.indexOf('</h1>')).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ');
+    expect(h1).toContain('كوادرنا — أساس تصميم وتطوير منصات الموارد البشرية العربية');
+    expect(HERO.lede).toMatch(/شركات البرمجيات/);
+    const hero = html.slice(html.indexOf('ld-hero__copy'), html.indexOf('data-value-overview'));
+    expect(hero).not.toMatch(/SaaS|مطابق|معتمد|شهادة|ISO|أسرع|أسرع من|ضعف|توفير\s+\d|خلال\s+(أيام|أسابيع)/);
+  });
+
+  it('the value overview near the hero covers the seven areas with a state each, before the vision section', () => {
+    expect(VALUE.items.map(i => i.id)).toEqual(['hr', 'system', 'ai', 'data', 'handoff', 'toolkit', 'demo']);
+    const overview = html.slice(html.indexOf('data-value-overview'), html.indexOf('id="ld-vision-title"'));
+    expect(overview.match(/data-value-item="/g)).toHaveLength(7);
+    for (const i of VALUE.items) expect(overview).toContain(i.title);
+    // Data Maps, handoff and the Toolkit are not presented as accepted/delivered
+    for (const id of ['data', 'handoff', 'toolkit']) expect(VALUE.items.find(i => i.id === id)?.state).toBe('pending');
+    expect(VALUE.items.find(i => i.id === 'ai')?.body).toContain('لا تعمل في الديمو');
+    expect(overview.match(/ld-value__chip--pending/g)).toHaveLength(3);
+    expect(overview).not.toMatch(/\d+\s*(شاشة|شاشات|إطار|إطارات|عقدة)/);
+  });
+
+  it('licensing: the exact conditional sentence is used and no entitlement, term or price is invented', () => {
+    expect(PACKAGE.release).toBe('تتوفر أصول التطوير والقوالب المتخصصة وفق محتويات الباقة والترخيص المعتمد.');
+    expect(section('package')).toContain(PACKAGE.release);
+    expect(FAQ.items.find(i => i.q.includes('فريق التطوير'))?.a).toContain('وفق الباقة المعتمدة'); // conditional: «قد يستلم … وفق الباقة»
+    expect(text).not.toMatch(/ضمن الحزمة\s*،?\s*ولا تُعرض|تُسلَّم ضمن|ما يستلمه|ما تحصل عليه/);
+    expect(text).not.toMatch(/إعادة التوزيع|حقوق (الاستخدام|النشر)|رخصة (دائمة|غير محدودة)|مدى الحياة/);
+  });
+
+  it('no internal Figma node ids, file keys or Notion links reach the public markup', () => {
+    expect(html).not.toMatch(/\b\d{3,5}:\d{3,6}\b/); // Figma node-id shape; demo request ids such as LV-2026-102 use hyphens
+    expect(html).not.toMatch(/figma\.com|notion\.(so|com)|uE4G0jiXhcA65d6AxJljvO|3vNsjBj9Gen1HSrtKrjd13/);
+  });
+
+  it('the shipped content data (bundled into the public JS) carries no Figma node ids, even in unrendered fields', async () => {
+    const content = await import('./content');
+    const serialized = JSON.stringify(content);
+    expect(serialized).not.toMatch(/\b\d{3,5}:\d{3,6}\b/);
+    expect(serialized).not.toMatch(/HR_[A-Z]{2,}_[A-Z_]+|uE4G0jiXhcA65d6AxJljvO|3vNsjBj9Gen1HSrtKrjd13/);
+  });
+
+  it('Data Maps & Integrations is a design track that separates existing references from pending final UI, with no live-integration claim', () => {
+    const arch = section('architecture');
+    expect(arch).toContain('data-dm-track="true"');
+    expect(arch).toContain('data-dm-status="existing"');
+    expect(arch).toContain('data-dm-status="pending"');
+    expect(ARCHITECTURE.track.pending.title).toContain('قيد الاعتماد');
+    expect(arch).toContain(ARCHITECTURE.providerNote);
+    expect(arch).not.toMatch(/\b35\b|٣٥|\b569\b|٥٦٩|شراكة تجارية مع|موصّلات (جاهزة|فعلية متاحة)/);
+    expect(arch).toContain('data-blueprint-boundary');
+    expect(PACKAGE.groups.find(g => g.id === 'blueprint')?.label).toBe('خرائط البيانات والتكامل');
+    expect(PACKAGE.groups.find(g => g.id === 'blueprint')?.items.join(' ')).toContain('تُحدَّد بعد الاعتماد');
+  });
+
+  it('page metadata sits in index.html and describes the commercial design product', async () => {
+    const { readFileSync } = await import('node:fs');
+    const idx = readFileSync(new URL('../../../index.html', import.meta.url), 'utf8');
+    expect(idx).toContain('<title>كوادرنا — أساس تصميم وتطوير منصات الموارد البشرية العربية</title>');
+    for (const k of ['name="description"', 'property="og:title"', 'property="og:description"', 'property="og:locale" content="ar_SA"', 'name="twitter:card"']) expect(idx).toContain(k);
+    expect(idx).not.toMatch(/\b14\b|\b26\b|\b12\b|١٤|٢٦|١٢/);
+    expect(idx).toContain('ليست منصة جاهزة للتشغيل');
   });
 });
 

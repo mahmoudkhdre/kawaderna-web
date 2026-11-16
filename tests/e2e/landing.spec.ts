@@ -20,7 +20,7 @@ test.describe('Landing page — isolated preview', () => {
       page.on('pageerror', e => errors.push(e.message));
       await page.setViewportSize({ width, height: 900 });
       await page.goto(PREVIEW);
-      await expect(page.locator('h1')).toContainText('منظومة موارد بشرية صُمِّمت بالعربية');
+      await expect(page.locator('h1')).toContainText('كوادرنا — أساس تصميم وتطوير منصات الموارد البشرية العربية');
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow).toBeLessThanOrEqual(0);
       await expect(page.locator('[data-demo-cta="hero"]')).toBeVisible();
@@ -197,8 +197,10 @@ test.describe('Landing page — isolated preview', () => {
       await expect(creator.getByRole('heading', { level: 2 })).toBeInViewport();
       // the process section links the verified Behance case study
       await expect(page.locator('[data-case-study="process"]')).toHaveAttribute('href', expected.behance);
-      // the final CTA's purchase inquiry is active and uses the owner mailto
-      await expect(page.locator('[data-contact-cta]')).toHaveAttribute('href', /^mailto:mahmoudkhdre9@gmail\.com\?subject=/);
+      // every purchase-inquiry CTA (nav, mobile menu, hero, final) is active and uses the owner mailto
+      const inquiry = page.locator('[data-contact-cta]');
+      await expect(inquiry).toHaveCount(4);
+      for (const cta of await inquiry.all()) await expect(cta).toHaveAttribute('href', /^mailto:mahmoudkhdre9@gmail\.com\?subject=/);
     });
   }
 
