@@ -67,6 +67,10 @@ export const STATUS_LABEL: Record<ModuleStatus, string> = {
 export const CTA = {
   primary: 'استفسر عن شراء الحزمة',
   secondary: 'جرّب الديمو',
+  /** Screen-reader note appended inside the primary CTA when it opens WhatsApp in a new tab. */
+  opensWhatsApp: '(يفتح واتساب في نافذة جديدة)',
+  /** Small text link under the hero/final actions: the always-visible way out if WhatsApp cannot open. */
+  altChannels: 'أو تواصل عبر البريد والهاتف',
 } as const;
 
 export const NAV_LINKS = [
@@ -616,6 +620,13 @@ export const FINAL = {
  * `inquiryHref` as its default `contactHref`.
  */
 const OWNER_EMAIL = 'mahmoudkhdre9@gmail.com';
+/** Owner WhatsApp number in wa.me format (country code, no «+» or leading zeros); the same number the page already shows. */
+const WHATSAPP_URL = 'https://wa.me/201094097432';
+/**
+ * Prefilled message for the primary purchase inquiry. It only fills the WhatsApp compose box (the visitor presses
+ * send), asks for no personal data, and makes no claim about a ready-to-run product, price or protected material.
+ */
+export const INQUIRY_MESSAGE = 'السلام عليكم، أود الاستفسار عن شراء أو ترخيص حزمة كوادرنا لتصميم وتطوير منصات الموارد البشرية العربية. أرجو إفادتي بتفاصيل الباقة وخطوات التواصل.';
 export const CREATOR = {
   kicker: 'صاحب المشروع',
   name: 'محمود خضر',
@@ -626,10 +637,10 @@ export const CREATOR = {
   roles: ['تخطيط المنتج', 'تجربة المستخدم والواجهات', 'نظام التصميم', 'دراسة الحالة'],
   contactTitle: 'تواصل مباشرة',
   contactBody: 'للاستفسار عن الشراء أو الترخيص، تواصل مع محمود مباشرة.',
-  inquiryHref: `mailto:${OWNER_EMAIL}?subject=${encodeURIComponent('استفسار عن شراء كوادرنا')}`,
+  inquiryHref: `${WHATSAPP_URL}?text=${encodeURIComponent(INQUIRY_MESSAGE)}`,
   channels: [
     { id: 'email', label: 'البريد الإلكتروني', value: OWNER_EMAIL, ltr: true, href: `mailto:${OWNER_EMAIL}` },
-    { id: 'whatsapp', label: 'واتساب', value: 'مراسلة مباشرة', ltr: false, href: 'https://wa.me/201094097432', external: true },
+    { id: 'whatsapp', label: 'واتساب', value: 'مراسلة مباشرة', ltr: false, href: WHATSAPP_URL, external: true },
     { id: 'phone', label: 'اتصال هاتفي', value: '+20 109 409 7432', ltr: true, href: 'tel:+201094097432' },
     { id: 'behance', label: 'Behance', value: 'دراسة الحالة كاملة', ltr: false, href: CASE_STUDY.href, external: true },
   ],

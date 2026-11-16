@@ -1,6 +1,6 @@
 import { BookOpen, Check, Mail, MessageCircle, Phone, Plus } from 'lucide-react';
 import { BRAND, CREATOR, CTA, FAQ, FINAL, FOOTER } from '../content';
-import { BrandMark, DemoLink, InquiryLink, Reveal, SectionHeading } from './primitives';
+import { AltChannelsLink, BrandMark, DemoLink, InquiryLink, Reveal, SectionHeading } from './primitives';
 
 export const Faq = () => (
   <section id="faq" className="ld-section ld-faq" aria-labelledby="ld-faq-title">
@@ -80,6 +80,7 @@ export const FinalCta = ({ demoHref, onStartDemo, contactHref }: FinalCtaProps) 
         <InquiryLink href={contactHref} label={CTA.primary} variant="onDark" size="lg" placement="final" />
         <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.secondary} variant="outlineDark" size="lg" placement="final" />
       </div>
+      <AltChannelsLink placement="final" />
       <p className="ld-final__note">{FINAL.note}</p>
     </div>
   </section>

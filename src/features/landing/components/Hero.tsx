@@ -1,5 +1,5 @@
 import { CTA, HERO, VALUE } from '../content';
-import { DemoLink, InquiryLink, ModuleIcon } from './primitives';
+import { AltChannelsLink, DemoLink, InquiryLink, ModuleIcon } from './primitives';
 import dashboardImg from '../assets/figma-dashboard.jpg';
 import employeeImg from '../assets/figma-employee-m.jpg';
 
@@ -56,6 +56,7 @@ export const Hero = ({ demoHref, onStartDemo, contactHref }: { demoHref: string;
           <InquiryLink href={contactHref} label={CTA.primary} size="lg" placement="hero" />
           <DemoLink href={demoHref} onStartDemo={onStartDemo} label={CTA.secondary} variant="ghost" size="lg" placement="hero" />
         </div>
+        <AltChannelsLink placement="hero" />
         <p className="ld-hero__note">{HERO.note}</p>
       </div>
       <ProductStage />

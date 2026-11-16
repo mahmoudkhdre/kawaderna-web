@@ -197,10 +197,18 @@ test.describe('Landing page — isolated preview', () => {
       await expect(creator.getByRole('heading', { level: 2 })).toBeInViewport();
       // the process section links the verified Behance case study
       await expect(page.locator('[data-case-study="process"]')).toHaveAttribute('href', expected.behance);
-      // every purchase-inquiry CTA (nav, mobile menu, hero, final) is active and uses the owner mailto
+      // every purchase-inquiry CTA (nav, mobile menu, hero, final) is active: it opens the owner WhatsApp in a new tab
+      // with the prefilled message (the visitor still presses send)
       const inquiry = page.locator('[data-contact-cta]');
       await expect(inquiry).toHaveCount(4);
-      for (const cta of await inquiry.all()) await expect(cta).toHaveAttribute('href', /^mailto:mahmoudkhdre9@gmail\.com\?subject=/);
+      for (const cta of await inquiry.all()) {
+        await expect(cta).toHaveAttribute('href', /^https:\/\/wa\.me\/201094097432\?text=/);
+        await expect(cta).toHaveAttribute('target', '_blank');
+        await expect(cta).toHaveAttribute('rel', 'noopener noreferrer');
+      }
+      // the visible fallback under the hero and final actions leads to the contact section
+      await expect(page.locator('[data-contact-alt]')).toHaveCount(2);
+      for (const alt of await page.locator('[data-contact-alt]').all()) await expect(alt).toHaveAttribute('href', '#creator');
     });
   }
 

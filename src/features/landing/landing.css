@@ -872,3 +872,10 @@
 .ld-notfound__text { margin: 0; max-inline-size: 480px; font-size: 18px; line-height: 28px; color: var(--ld-ink-2); }
 .ld-notfound__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-block-start: 8px; }
 @media (max-width: 479px) { .ld-notfound__actions { display: grid; inline-size: 100%; } .ld-notfound__actions .ld-btn { inline-size: 100%; } .ld-notfound__title { font-size: 30px; line-height: 40px; } }
+
+/* ---------- Inquiry fallback: quiet text link under the primary actions (hero, final) ---------- */
+.ld-altchannels { margin: 0; font-size: 14px; line-height: 20px; }
+.ld-altchannels__link { display: inline-block; padding-block: 12px; margin-block: -12px; font-weight: 500; color: var(--ld-primary);
+  text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.ld-altchannels__link:hover { text-decoration-thickness: 2px; }
+.ld-altchannels--final .ld-altchannels__link { color: #fff; }

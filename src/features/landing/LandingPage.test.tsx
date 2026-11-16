@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { LandingPage } from './index';
-import { AI_SHOTS, AI_SPACE, AI_USE_CASES, ARCHITECTURE, ECOSYSTEM, CASE_STUDY, CREATOR, CTA, FAQ, FOOTER, HERO, JOURNEY, MODULE_GROUPS, NAV_LINKS, PACKAGE, SWATCHES, TOOLKIT, VALUE } from './content';
+import { AI_SHOTS, AI_SPACE, AI_USE_CASES, ARCHITECTURE, ECOSYSTEM, CASE_STUDY, CREATOR, CTA, FAQ, FOOTER, HERO, INQUIRY_MESSAGE, JOURNEY, MODULE_GROUPS, NAV_LINKS, PACKAGE, SWATCHES, TOOLKIT, VALUE } from './content';
 import { unitCount } from './format';
 
 const html = renderToStaticMarkup(<LandingPage />);
@@ -35,10 +35,16 @@ describe('Landing page — structure and CTA contract', () => {
     expect(text.split(CTA.secondary).length - 1).toBe(5);
   });
 
-  it('every inquiry CTA is the primary action «استفسر عن شراء الحزمة» and points to the owner mailto, with no checkout', () => {
+  it('every inquiry CTA is the primary action «استفسر عن شراء الحزمة» and opens the owner WhatsApp with the prefilled message, with no checkout', () => {
     const ctas = [...html.matchAll(/<a [^>]*data-contact-cta="([^"]+)"[^>]*>/g)];
     expect(ctas.map(m => m[1]).sort()).toEqual(['final', 'hero', 'mobile-menu', 'nav']);
-    for (const [tag] of ctas) expect(tag).toContain(`href="${CREATOR.inquiryHref.replace(/&/g, '&amp;')}"`);
+    for (const [tag] of ctas) {
+      expect(tag).toContain(`href="${CREATOR.inquiryHref.replace(/&/g, '&amp;')}"`);
+      expect(tag).toContain('target="_blank"');
+      expect(tag).toContain('rel="noopener noreferrer"');
+    }
+    // each of the four CTAs tells screen-reader users that it opens WhatsApp in a new tab
+    expect(html.split(CTA.opensWhatsApp)).toHaveLength(5);
     expect(CTA.primary).toBe('استفسر عن شراء الحزمة');
     expect(text.split(CTA.primary).length - 1).toBe(4);
     const hero = html.slice(html.indexOf('class="ld-hero__actions"'), html.indexOf('</div>', html.indexOf('class="ld-hero__actions"')));
@@ -199,11 +205,41 @@ describe('Landing page — commercial integrity', () => {
     expect(creator).not.toMatch(/شركة|مؤسسة|معتمد|خبير|سنوات خبرة|عملاء/);
   });
 
-  it('activates the purchase inquiry with the owner mailto by default, and lets the host override it', () => {
+  it('the prefilled WhatsApp inquiry targets the page\'s own number and carries a neutral, claim-free message', () => {
+    const url = new URL(CREATOR.inquiryHref);
+    expect(`${url.origin}${url.pathname}`).toBe('https://wa.me/201094097432');
+    expect(CREATOR.channels.find(c => c.id === 'whatsapp')?.href).toBe('https://wa.me/201094097432');
+    expect(CREATOR.channels.find(c => c.id === 'phone')?.href).toBe('tel:+201094097432');
+    const message = url.searchParams.get('text') ?? '';
+    expect(message).toBe(INQUIRY_MESSAGE);
+    expect(message).toMatch(/شراء أو ترخيص حزمة كوادرنا/);
+    // it only prefills the compose box: no personal data, price, readiness claim or protected-material wording
+    expect(message).not.toMatch(/\d|@|ريال|سعر|جاهز للتشغيل|منصة جاهزة|Toolkit|Blueprint|برومبت|Prompt/i);
+    expect(message.length).toBeLessThan(250);
+  });
+
+  it('a visible text link under the hero and final actions leads to the email and phone, as a quiet fallback', () => {
+    const alts = [...html.matchAll(/<a [^>]*data-contact-alt="([^"]+)"[^>]*>([^<]*)<\/a>/g)];
+    expect(alts.map(m => m[1]).sort()).toEqual(['final', 'hero']);
+    for (const [tag, , label] of alts) { expect(tag).toContain('href="#creator"'); expect(label).toBe(CTA.altChannels); }
+    // it is a text link, not a third button, and does not count as a purchase-inquiry CTA
+    for (const [tag] of alts) expect(tag).not.toMatch(/data-contact-cta|ld-btn/);
+    // it sits after the action row, outside it, so the primary/secondary pair is unchanged
+    const hero = html.slice(html.indexOf('class="ld-hero__actions"'));
+    expect(hero.indexOf('</div>')).toBeLessThan(hero.indexOf('data-contact-alt="hero"'));
+  });
+
+  it('a host-supplied mailto stays a same-tab link without the new-tab note or target', () => {
+    const mail = renderToStaticMarkup(<LandingPage contactHref="mailto:team@example.test?subject=x" />);
+    for (const [tag] of mail.matchAll(/<a [^>]*data-contact-cta="[^"]+"[^>]*>/g)) expect(tag).not.toMatch(/target=|rel=/);
+    expect(mail).not.toContain(CTA.opensWhatsApp);
+  });
+
+  it('activates the purchase inquiry with the owner WhatsApp by default, and lets the host override it', () => {
     const buttons = html.match(/<a [^>]*data-contact-cta="final"[^>]*>/g);
     expect(buttons).toHaveLength(1);
     expect(buttons?.[0]).toContain(`href="${CREATOR.inquiryHref.replace(/&/g, '&amp;')}"`);
-    expect(CREATOR.inquiryHref.startsWith('mailto:mahmoudkhdre9@gmail.com?subject=')).toBe(true);
+    expect(CREATOR.inquiryHref.startsWith('https://wa.me/201094097432?text=')).toBe(true);
     const withContact = renderToStaticMarkup(<LandingPage contactHref="https://example.test/inquiry" />);
     expect(withContact.match(/<a [^>]*data-contact-cta="[^"]+"[^>]*>/g)).toHaveLength(4);
     for (const [tag] of withContact.matchAll(/<a [^>]*data-contact-cta="[^"]+"[^>]*>/g)) expect(tag).toContain('href="https://example.test/inquiry"');

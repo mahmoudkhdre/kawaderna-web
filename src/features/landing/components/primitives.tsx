@@ -1,9 +1,10 @@
 import type { ElementType, MouseEvent, ReactNode } from 'react';
 import {
   ArrowLeft, Calendar, ChartColumnIncreasing, Clock, CreditCard, Crown, DollarSign, HeartPulse, LayoutDashboard,
-  FileText, KeyRound, ListTodo, Mail, Network, Palette, Play, Settings, ShieldCheck, Sparkles, Target, Users, Wallet,
+  FileText, KeyRound, ListTodo, Mail, MessageCircle, Network, Palette, Play, Settings, ShieldCheck, Sparkles, Target, Users, Wallet,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { CREATOR, CTA } from '../content';
 import { useReveal } from './useReveal';
 
 const ICONS: Record<string, LucideIcon> = {
@@ -61,12 +62,30 @@ export interface InquiryLinkProps {
   readonly placement: string;
 }
 
-/** The primary purchase-inquiry CTA: a plain link to the owner-approved contact destination (no checkout, no form). */
-export const InquiryLink = ({ href, label, variant = 'primary', size = 'md', placement }: InquiryLinkProps) => (
-  <a className={`ld-btn ld-btn--${variant} ld-btn--${size}`} href={href} data-contact-cta={placement}>
-    <Mail size={18} strokeWidth={1.5} aria-hidden="true" focusable="false" />
-    <span>{label}</span>
-  </a>
+/**
+ * The primary purchase-inquiry CTA: a plain link to the owner-approved contact destination (no checkout, no form).
+ * An external destination (the default WhatsApp link, or a host-supplied URL) opens in a new tab and says so to
+ * screen readers; a `mailto:` or in-page destination stays a same-tab link. The icon follows the destination.
+ */
+export const InquiryLink = ({ href, label, variant = 'primary', size = 'md', placement }: InquiryLinkProps) => {
+  const whatsapp = href.startsWith('https://wa.me/');
+  const external = /^https?:\/\//.test(href);
+  const Icon = whatsapp ? MessageCircle : Mail;
+  return (
+    <a className={`ld-btn ld-btn--${variant} ld-btn--${size}`} href={href} data-contact-cta={placement}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+      <Icon size={18} strokeWidth={1.5} aria-hidden="true" focusable="false" />
+      <span>{label}</span>
+      {external && <span className="ld-sr">{whatsapp ? CTA.opensWhatsApp : CREATOR.newTab}</span>}
+    </a>
+  );
+};
+
+/** Quiet text link under the primary actions: the visible way out to the email and phone if WhatsApp cannot open. */
+export const AltChannelsLink = ({ placement }: { placement: 'hero' | 'final' }) => (
+  <p className={`ld-altchannels ld-altchannels--${placement}`}>
+    <a className="ld-altchannels__link" href="#creator" data-contact-alt={placement}>{CTA.altChannels}</a>
+  </p>
 );
 
 export const Reveal = ({ as: Tag = 'div', className = '', children, delay = 0 }: {
