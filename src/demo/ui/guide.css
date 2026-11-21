@@ -1,0 +1,114 @@
+/*
+ * 006 P4/P5 foundation + guide styles. Tokens only: every value is a --kd-* token (Figma semantic/primitive,
+ * see demo-ui.css) or the documented tokens.ts shadow. No new palette, no new hex values.
+ */
+.kd { --kd-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, .05); /* tokens.ts shadows.sm */ }
+.kd-btn--ghost { background: transparent; border-color: transparent; color: var(--kd-accent); }
+.kd-btn--secondary:hover, .kd-btn--ghost:hover { background: var(--kd-surface-info); border-color: var(--kd-primary-300); }
+.kd-btn--primary:hover { filter: brightness(.92); }
+.kd-btn--primary:active, .kd-btn--secondary:active, .kd-btn--ghost:active { filter: brightness(.88); }
+.kd-btn:disabled, .kd-btn[aria-disabled="true"] { background: var(--kd-surface-muted); border-color: var(--kd-border); color: var(--kd-text-2); cursor: not-allowed; filter: none; }
+.kd-btn { text-decoration: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .kd-btn, .kd-choice, .kd-guide__tool { transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, filter 150ms ease; }
+}
+.kd-select { min-height: 44px; max-width: 100%; padding: 8px 12px; border: 1px solid var(--kd-input); border-radius: 6px; background: #fff; color: var(--kd-foreground); font: 500 14px/24px 'Tajawal', sans-serif; }
+.kd-badge { display: inline-flex; align-items: center; margin-inline-start: 8px; padding: 4px 8px; border-radius: 9999px; background: var(--kd-surface-info); border: 1px solid var(--kd-primary-300); color: var(--kd-accent); font-size: 12px; line-height: 16px; font-weight: 700; }
+
+/* ---------- entry choice, hint, resume bar ---------- */
+.kd-intro { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px; text-align: center; background: var(--kd-surface-info); border: 1px solid var(--kd-primary-300); border-radius: 12px; box-shadow: var(--kd-shadow-sm); }
+.kd-intro__icon { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 9999px; background: #fff; border: 1px solid var(--kd-primary-300); color: var(--kd-accent); }
+.kd-intro__title { margin: 4px 0 0; font-size: 20px; line-height: 28px; font-weight: 700; color: var(--kd-foreground); }
+.kd-intro__body { margin: 0; font-size: 16px; line-height: 24px; color: var(--kd-text-2); }
+.kd-intro--hint { align-items: flex-start; text-align: start; }
+.kd-intro__choices { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; margin-top: 8px; }
+.kd-intro { text-align: center; }
+.kd-choice { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 12px 16px; text-align: start; border: 1px solid var(--kd-border); border-radius: 12px; background: #fff; color: var(--kd-foreground); font: inherit; cursor: pointer; box-shadow: var(--kd-shadow-sm); }
+.kd-choice:hover { border-color: var(--kd-primary-500); box-shadow: 0 0 0 3px var(--kd-surface-info); }
+.kd-choice--primary { background: var(--kd-accent); border-color: var(--kd-accent); color: #fff; }
+.kd-choice--primary:hover { border-color: var(--kd-accent); filter: brightness(.94); box-shadow: 0 0 0 3px var(--kd-primary-300); }
+.kd-choice__text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.kd-choice__text strong { font-size: 16px; line-height: 24px; }
+.kd-choice__text span { font-size: 14px; line-height: 20px; }
+.kd-choice svg { flex: none; }
+.kd-resume { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 12px 16px 0; padding: 4px 12px; border: 1px dashed var(--kd-primary-300); border-radius: 8px; background: var(--kd-surface-info); color: var(--kd-text-2); font-size: 14px; line-height: 20px; }
+.kd-resume svg { color: var(--kd-accent); flex: none; }
+.kd-login__col > .kd-resume { margin: 0; }
+.kd-demo__item[data-recommended="true"] { border-color: var(--kd-accent); background: var(--kd-surface-info); box-shadow: 0 0 0 2px var(--kd-primary-300); }
+
+/* ---------- guide panel ---------- */
+/* Banner below the header: full width, content aligned to the page column. */
+.kd-guide { --kd-guide-gutter: max(16px, calc((100% - 1280px) / 2)); margin: 0 0 8px; background: var(--kd-card); border-bottom: 1px solid var(--kd-primary-300); border-top: 1px solid var(--kd-primary-300); border-inline-start: 4px solid var(--kd-accent); box-shadow: var(--kd-shadow-sm); }
+.kd-guide__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; padding: 4px var(--kd-guide-gutter); background: var(--kd-surface-info); font-size: 14px; line-height: 20px; color: var(--kd-text-2); }
+.kd-guide__badge { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--kd-accent); }
+.kd-guide__progress { margin-inline-start: auto; font-weight: 700; color: var(--kd-foreground); font-variant-numeric: tabular-nums; }
+.kd-guide__tools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.kd-guide__tool { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 4px 12px; border: 0; border-radius: 6px; background: transparent; color: var(--kd-accent); font: 500 14px/20px 'Tajawal', sans-serif; cursor: pointer; }
+.kd-guide__tool:hover { background: #fff; }
+.kd-guide__body { padding: 4px var(--kd-guide-gutter) 16px; display: flex; flex-direction: column; gap: 12px; }
+.kd-guide__body[hidden] { display: none; }
+.kd-guide__title { margin: 0; font-size: 20px; line-height: 28px; font-weight: 700; color: var(--kd-foreground); }
+.kd-guide__text { margin: 0; font-size: 16px; line-height: 24px; color: var(--kd-foreground); }
+.kd-guide__hint { margin: 0; font-size: 14px; line-height: 20px; color: var(--kd-text-2); }
+.kd-guide__hint--other { padding-inline-start: 12px; border-inline-start: 3px solid var(--kd-accent); font-weight: 500; color: var(--kd-foreground); }
+.kd-guide__why { margin: 0; padding: 12px; border-radius: 8px; background: var(--kd-surface-muted); font-size: 14px; line-height: 20px; color: var(--kd-text-2); }
+.kd-guide__why strong { color: var(--kd-foreground); }
+.kd-guide__step { display: flex; flex-direction: column; gap: 12px; }
+.kd-guide__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.kd-guide__actions .kd-btn { flex: 0 1 auto; }
+.kd-guide__track { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 12px; border-top: 1px solid var(--kd-nav-border); font-size: 14px; line-height: 20px; color: var(--kd-text-2); }
+.kd-guide__muted { color: var(--kd-text-2); }
+.kd-guide__pick { margin-inline-start: auto; max-width: 100%; }
+.kd-guide__fixed, .kd-guide__limits { margin: 0; font-size: 12px; line-height: 16px; color: var(--kd-text-2); }
+.kd-guide__lines li { display: flex; align-items: flex-start; gap: 8px; }
+.kd-guide__lines svg { flex: none; margin-top: 4px; color: var(--kd-accent); }
+.kd-guide__summary { display: flex; flex-direction: column; gap: 12px; }
+.kd-guide__summary-head { display: flex; align-items: center; gap: 12px; }
+.kd-guide__lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 16px; line-height: 24px; color: var(--kd-foreground); }
+.kd-guide__reason { margin: 0; padding: 12px; border-radius: 8px; background: var(--kd-surface-muted); border-inline-start: 3px solid var(--kd-destructive); font-size: 14px; line-height: 20px; color: var(--kd-foreground); overflow-wrap: anywhere; white-space: pre-wrap; }
+.kd-guide__note { margin: 0; padding: 12px; border-radius: 8px; background: var(--kd-surface-info); font-size: 14px; line-height: 20px; color: var(--kd-foreground); }
+.kd-guide__value { margin: 0; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--kd-text-2); }
+
+/* Stepper: icon + label + state word. Colour never carries the meaning alone. */
+.kd-steps { --kd-step-icon: 24px; /* = lucide size 24 (spacing token 6); the connector sits on the icon's centre line */ list-style: none; margin: 0; padding: 12px 0 4px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.kd-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.kd-step::before, .kd-step::after { content: ''; position: absolute; top: calc(var(--kd-step-icon) / 2 - 1px); width: calc(50% - 16px); height: 2px; background: var(--kd-border); }
+.kd-step::before { inset-inline-start: 0; }
+.kd-step::after { inset-inline-end: 0; }
+.kd-step:first-child::before, .kd-step:last-child::after { display: none; }
+.kd-step[data-state="completed"]::before, .kd-step[data-state="current"]::before, .kd-step[data-state="completed"]::after { background: var(--kd-accent); }
+.kd-step[data-state="not_applicable"]::before, .kd-step[data-state="not_applicable"]::after { background: transparent; border-top: 2px dashed var(--kd-border); height: 0; }
+.kd-step__icon { flex: none; background: #fff; border-radius: 9999px; position: relative; z-index: 1; }
+.kd-step__icon--done, .kd-step__icon--current { color: var(--kd-accent); }
+.kd-step__icon--approved { color: var(--kd-success); }
+.kd-step__icon--rejected { color: var(--kd-destructive); }
+.kd-step__icon--muted { color: var(--kd-text-2); }
+.kd-step__label { font-size: 14px; line-height: 20px; font-weight: 700; color: var(--kd-foreground); overflow-wrap: anywhere; }
+.kd-step__state { font-size: 12px; line-height: 16px; color: var(--kd-text-2); overflow-wrap: anywhere; }
+.kd-step[data-state="current"] .kd-step__label { color: var(--kd-accent); }
+.kd-step[data-state="upcoming"] .kd-step__label, .kd-step[data-state="not_applicable"] .kd-step__label { font-weight: 500; color: var(--kd-text-2); }
+/* `hidden` must win over the display rules of the classes above (lists, buttons, labels). */
+.kd-guide [hidden] { display: none !important; }
+.kd-guide__stage { margin: 0; font-size: 12px; line-height: 16px; color: var(--kd-text-2); }
+.kd-guide__stage strong { font-weight: 700; color: var(--kd-accent); }
+.kd-guide__hint-text { margin: 0; }
+.kd-guide__hint--other .kd-btn { margin-top: 8px; }
+@media (max-width: 767px) {
+  .kd-guide { --kd-guide-gutter: 16px; } /* Figma mobile margin */
+  .kd-guide__body { padding-bottom: 16px; }
+  .kd-guide__title { font-size: 18px; line-height: 28px; }
+  .kd-resume { margin: 12px 16px 0; }
+  /* O-2: compact guide. Same tokens and scale, tighter rhythm (spacing 2 = 8, 1 = 4); nothing is removed from the DOM contract. */
+  .kd-guide[data-compact="true"] .kd-guide__bar { gap: 0 12px; }
+  .kd-guide[data-compact="true"] .kd-guide__body { gap: 8px; padding-top: 8px; padding-bottom: 12px; }
+  .kd-guide[data-compact="true"] .kd-guide__step { gap: 4px; }
+  .kd-guide[data-compact="true"] .kd-guide__title { font-size: 16px; line-height: 24px; }
+  .kd-guide[data-compact="true"] .kd-guide__text { font-size: 14px; line-height: 20px; }
+  .kd-guide[data-compact="true"] .kd-guide__track { padding-top: 8px; }
+  .kd-guide[data-compact="true"] .kd-guide__summary { gap: 8px; }
+  /* The sign-in hint is the same guide on the sign-in screen: it must not push the form off the first screen. */
+  .kd-intro--hint { padding: 12px 16px; gap: 4px; }
+  .kd-intro--hint .kd-intro__icon { width: 32px; height: 32px; }
+  .kd-intro--hint .kd-intro__title { margin: 0; font-size: 16px; line-height: 24px; }
+  .kd-intro--hint .kd-intro__body { font-size: 14px; line-height: 20px; }
+}

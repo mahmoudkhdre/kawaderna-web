@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { CheckCircle2, Inbox, XCircle } from 'lucide-react';
 import { INBOX_NOW, lowBalancePendingHR } from '../../domain/leave/fixtures';
 import { decideAsHr, validateHrReason } from '../../domain/leave/hrFinalDecision';
 import { selectHrReview } from '../../domain/leave/hrReview';
@@ -10,7 +11,10 @@ import { formatDateRange, formatDateTime, formatDays, formatNumber } from '../..
 import { tokens } from '../../lib/tokens';
 import type { HrDecisionBinding } from '../../demo/contracts';
 import { DEMO_COPY } from '../../demo/copy';
+import { actorLabel } from '../../demo/roleLabels';
 import { selectHrSubject } from '../../demo/state';
+import { EmptyState } from '../../demo/ui/EmptyState';
+import { countRequests } from '../../lib/arabicPlural';
 
 const actor = { id: 'HR-1', role: Persona.HR };
 // Gap 4-local button/error colours; values mirror the approved Gap 2/3 Figma variables (not shared tokens).
@@ -30,13 +34,19 @@ const errors: Record<string, string> = {
   reason_required: 'اكتب سببًا واضحًا للرفض.', reason_too_long: 'السبب يتجاوز ٥٠٠ حرف Unicode.',
 };
 
-export interface HRFinalDecisionPageProps { binding?: HrDecisionBinding }
+export interface HRFinalDecisionPageProps {
+  binding?: HrDecisionBinding;
+  /** Optional context-aware empty state (006 guide). Falls back to the neutral default. */
+  empty?: ReactNode;
+}
+
+const DefaultHrEmpty = () => <EmptyState icon={Inbox} title={DEMO_COPY.hrEmpty} body={DEMO_COPY.hrEmptyBody} hint={DEMO_COPY.hrEmptyHint} testId="hr" />;
 
 // Changing selection/actor/version discards an old confirmation and rejection draft before rendering.
-export const HRFinalDecisionPage = ({ binding }: HRFinalDecisionPageProps = {}) =>
-  <HRFinalDecisionContent key={binding ? `${binding.actor.role}:${binding.actor.id}:${binding.requestId}:${binding.requests.find(item => item.requestId === binding.requestId)?.version}` : 'standalone'} binding={binding} />;
+export const HRFinalDecisionPage = ({ binding, empty }: HRFinalDecisionPageProps = {}) =>
+  <HRFinalDecisionContent key={binding ? `${binding.actor.role}:${binding.actor.id}:${binding.requestId}:${binding.requests.find(item => item.requestId === binding.requestId)?.version}` : 'standalone'} binding={binding} empty={empty} />;
 
-const HRFinalDecisionContent = ({ binding }: HRFinalDecisionPageProps) => {
+const HRFinalDecisionContent = ({ binding, empty }: HRFinalDecisionPageProps) => {
   const [localRequests, setRequests] = useState<LeaveRequest[]>(() => binding ? [] : [structuredClone(lowBalancePendingHR)]);
   const requests = binding?.requests ?? localRequests;
   const currentActor = binding?.actor ?? actor;
@@ -96,7 +106,11 @@ const HRFinalDecisionContent = ({ binding }: HRFinalDecisionPageProps) => {
 
   return <main dir="rtl" className="mx-auto w-full px-4 py-6 md:px-6" style={{ maxWidth: 900, color: tokens.colors.text.primary }}>
     <h1 className="text-2xl font-bold">قرار الموارد البشرية النهائي</h1>
-    <p className="mb-3" style={{ color: tokens.colors.text.secondary }}>مراجعة طلب إجازة واحد تم تحويله من المدير بسبب عدم كفاية الرصيد.</p>
+    <p className="mb-3" style={{ color: tokens.colors.text.secondary }}>{!request
+      ? 'الطلبات المحوّلة من المدير بسبب عدم كفاية الرصيد تظهر هنا لاتخاذ القرار النهائي.'
+      : (binding?.selectableRequests?.length ?? 1) > 1
+        ? `الطلبات المحوّلة من المدير بسبب عدم كفاية الرصيد: ${countRequests(binding!.selectableRequests!.length)}. اختر الطلب الذي تريد مراجعته.`
+        : 'مراجعة طلب إجازة واحد تم تحويله من المدير بسبب عدم كفاية الرصيد.'}</p>
     {binding?.selectableRequests && binding.selectableRequests.length > 0 && <div className="mb-4">
       <label htmlFor="hr-request-selection" className="mb-1 block font-bold">اختر طلبًا للمراجعة</label>
       <select id="hr-request-selection" value={binding.requestId ?? ''} onChange={event => binding.onSelectRequest?.(event.target.value)}
@@ -107,7 +121,7 @@ const HRFinalDecisionContent = ({ binding }: HRFinalDecisionPageProps) => {
       </select>
     </div>}
     <p role="status" aria-live="polite" className={notice && noticeIsError ? 'mb-3' : 'sr-only'} style={noticeIsError ? { color: C.destructive } : undefined}>{notice}</p>
-    {review ? <article className="rounded-xl border p-4 md:p-6" style={{ background: tokens.colors.background.primary }}>
+    {review ? <article className="kd-surface rounded-xl border p-4 md:p-6" style={{ background: tokens.colors.background.primary }}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <h2 className="m-0 text-xl font-bold">طلب {review.employeeName}</h2>
         <span className="ltr-isolated" dir="ltr">{review.requestId}</span>
@@ -124,12 +138,12 @@ const HRFinalDecisionContent = ({ binding }: HRFinalDecisionPageProps) => {
         {review.route.map(step => <li key={step.role}>{step.role === 'manager' ? 'المدير' : 'الموارد البشرية'} — {step.status === 'approved' ? 'تمت الموافقة' : 'بانتظار القرار'}</li>)}
       </ol>
       <h3 className="mt-5 font-bold">سجل التحويل</h3>
-      {review.history.length ? <ol className="list-inside list-disc">{review.history.map((event, index) => <li key={index}>تحويل إلى الموارد البشرية بواسطة <bdi dir="ltr" className="whitespace-nowrap">{event.actor}</bdi> — <bdi>{formatDateTime(event.timestamp)}</bdi></li>)}</ol> : <p>سجل التحويل غير متاح.</p>}
+      {review.history.length ? <ol className="list-inside list-disc">{review.history.map((event, index) => <li key={index}>تحويل إلى الموارد البشرية بواسطة <bdi>{actorLabel(event.actor)}</bdi> —<bdi>{formatDateTime(event.timestamp)}</bdi></li>)}</ol> : <p>سجل التحويل غير متاح.</p>}
       <div className="mt-6 flex flex-wrap gap-3 max-sm:flex-col">
         <button type="button" style={btn.primary} onClick={() => { setNotice(''); setConfirm('approve'); }}>موافقة نهائية</button>
         <button type="button" style={btn.destructiveOutline} onClick={() => { setNotice(''); setConfirm('reject'); }}>رفض الطلب</button>
       </div>
-      {confirm && <section ref={confirmRef} aria-label="تأكيد القرار" className="mt-5 scroll-mb-4 rounded-lg border p-4">
+      {confirm && <section ref={confirmRef} aria-label="تأكيد القرار" className="kd-surface-inset mt-5 scroll-mb-4 rounded-lg border p-4">
         <h3 className="m-0 font-bold">{confirm === 'approve' ? 'تأكيد الموافقة النهائية' : 'تأكيد الرفض النهائي'}</h3>
         {confirm === 'reject' && <>
           <label htmlFor="hr-reason" className="mt-3 block">سبب الرفض للموظف</label>
@@ -142,12 +156,12 @@ const HRFinalDecisionContent = ({ binding }: HRFinalDecisionPageProps) => {
           <button type="button" disabled={busy} onClick={() => setConfirm(null)} style={busy ? btn.disabled : btn.secondary}>إلغاء</button>
         </div>
       </section>}
-    </article> : request ? <section className="rounded-xl border p-4 md:p-6"><h2 ref={outcomeRef} tabIndex={-1} className="font-bold">{request.approvalStatus === 'approved' ? 'تمت الموافقة النهائية' : request.approvalStatus === 'rejected' ? 'تم الرفض النهائي' : 'الطلب غير متاح'}</h2>
+    </article> : request ? <section className="kd-surface rounded-xl border p-4 md:p-6" data-hr-outcome={request.approvalStatus}><h2 ref={outcomeRef} tabIndex={-1} className="kd-outcome-title font-bold">{request.approvalStatus === 'approved' ? <CheckCircle2 size={22} className="kd-step__icon--approved" aria-hidden="true" /> : request.approvalStatus === 'rejected' ? <XCircle size={22} className="kd-step__icon--rejected" aria-hidden="true" /> : null}{request.approvalStatus === 'approved' ? 'تمت الموافقة النهائية' : request.approvalStatus === 'rejected' ? 'تم الرفض النهائي' : 'الطلب غير متاح'}</h2>
       <p>رقم الطلب: <span className="ltr-isolated" dir="ltr">{request.requestId}</span></p>
       {request.approvalStatus !== 'pending' && <p>تم تسجيل قرار الموارد البشرية في سجل الطلب.</p>}
       {escalationEvent && <p>تحويل من المدير إلى الموارد البشرية — <bdi>{formatDateTime(escalationEvent.timestamp)}</bdi></p>}
-      {finalEvent && <p>قرار الموارد البشرية بواسطة <bdi dir="ltr" className="whitespace-nowrap">{finalEvent.actor}</bdi> — <bdi>{formatDateTime(finalEvent.timestamp)}</bdi></p>}
+      {finalEvent && <p>قرار الموارد البشرية بواسطة <bdi>{actorLabel(finalEvent.actor)}</bdi> —<bdi>{formatDateTime(finalEvent.timestamp)}</bdi></p>}
       {request.approvalStatus === 'rejected' && typeof finalEvent?.details.reason === 'string' && <p style={{ overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>سبب الرفض: {finalEvent.details.reason}</p>}
-    </section> : <section className="rounded-lg border p-4 text-center md:p-6" style={{ background: tokens.colors.background.primary, borderColor: tokens.colors.border.base, color: tokens.colors.text.secondary }}>{DEMO_COPY.hrEmpty}</section>}
+    </section> : (empty ?? <DefaultHrEmpty />)}
   </main>;
 };

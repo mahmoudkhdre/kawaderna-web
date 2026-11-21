@@ -41,8 +41,8 @@ const routinePolicy: PolicyResult = {
 const lowBalanceRisk: RiskFlag = {
   severity: RiskSeverity.WARNING,
   code: 'LEAVE_LOW_BALANCE',
-  explanationAr: 'الرصيد سيصبح منخفضًا بعد هذا الطلب',
-  explanationEn: 'Balance will be low after this request',
+  explanationAr: 'مدة الطلب تتجاوز الرصيد المتاح',
+  explanationEn: 'Requested duration exceeds the available balance',
   affectedFields: ['balanceBefore', 'durationWorkingDays'],
   routeConsequence: 'requires_hr_review',
 };
@@ -52,7 +52,7 @@ const lowBalancePolicy: PolicyResult = {
   passed: false,
   requiresAcknowledgement: true,
   requiresElevatedReview: true,
-  explanationAr: 'الرصيد سيصبح منخفضًا - يتطلب موافقة الموارد البشرية',
+  explanationAr: 'يتطلب استثناء الرصيد مراجعة الموارد البشرية',
 };
 
 // ============================================================================

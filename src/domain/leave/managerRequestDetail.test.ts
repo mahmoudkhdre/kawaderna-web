@@ -104,6 +104,17 @@ describe('detail nextAction is Manager-viewer scoped', () => {
 });
 
 describe('selectManagerRequestDetail', () => {
+  it('reveals only the annual request balance when explicitly enabled for the assigned manager', () => {
+    const request: LeaveRequest = { ...f.lowBalance, leaveType: 'annual', balanceBefore: 0 };
+    const view = (r: LeaveRequest, id: string, enabled?: boolean) =>
+      selectManagerRequestDetail([r], r.requestId, id, INBOX_NOW, enabled);
+    expect(view(request, request.managerId)?.balance).not.toHaveProperty('annualBalanceBeforeDays');
+    expect(view(request, request.managerId, true)?.balance.annualBalanceBeforeDays).toBe(0);
+    expect(view(request, 'MGR-OTHER', true)).toBeNull();
+    expect(view({ ...request, leaveType: 'sick' }, request.managerId, true)?.balance)
+      .not.toHaveProperty('annualBalanceBeforeDays');
+  });
+
   it('returns the detail for a direct report, null otherwise', () => {
     expect(selectManagerRequestDetail(all, 'LV-2026-102', 'MGR-2001', INBOX_NOW)?.context.requestId).toBe('LV-2026-102');
     expect(selectManagerRequestDetail(all, 'LV-2026-102', 'MGR-9999', INBOX_NOW)).toBeNull();

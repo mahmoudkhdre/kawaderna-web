@@ -308,7 +308,7 @@ export interface ManagerRequestDetail {
   };
   risks: ManagerDetailRisk[];
   policies: ManagerDetailPolicy[];
-  balance: { sufficiency: BalanceSufficiency; lowBalanceAcknowledged: boolean };
+  balance: { sufficiency: BalanceSufficiency; lowBalanceAcknowledged: boolean; annualBalanceBeforeDays?: number };
   route: RouteStage[];
   path: ManagerDetailPathStep[];
   audit: ManagerDetailAuditEvent[];
@@ -402,7 +402,13 @@ export const selectManagerRequestDetail = (
   requestId: string,
   managerId: string,
   now: Date,
+  showAnnualBalance = false,
 ): ManagerRequestDetail | null => {
   const request = requests.find((r) => r.requestId === requestId && r.managerId === managerId);
-  return request ? toManagerRequestDetail(request, now) : null;
+  if (!request) return null;
+  const detail = toManagerRequestDetail(request, now);
+  if (showAnnualBalance === true && request.leaveType === 'annual') {
+    detail.balance.annualBalanceBeforeDays = request.balanceBefore;
+  }
+  return detail;
 };

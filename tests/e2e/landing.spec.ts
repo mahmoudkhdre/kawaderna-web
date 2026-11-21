@@ -237,6 +237,56 @@ test.describe('Landing page — isolated preview', () => {
     expect(outline).toBe('solid');
   });
 
+  // Owner-approved visual refinement 2026-11-17: hero 35px with only «كوادرنا» in Primary, 32px section headings,
+  // Primary value-card titles with a shadow, AI band on Primary/700 in both themes, pure-white analysis-flow borders.
+  for (const theme of ['light', 'dark'] as const) {
+    test(`visual refinement styles hold in ${theme} theme`, async ({ page }) => {
+      const primary = theme === 'light' ? 'rgb(29, 78, 216)' : 'rgb(96, 165, 250)';
+      const ink = theme === 'light' ? 'rgb(9, 9, 11)' : 'rgb(250, 250, 250)';
+      for (const width of [390, 1440]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(PREVIEW);
+        await page.evaluate(t => window.localStorage.setItem('ld-theme', t), theme);
+        await page.reload();
+        await expect(page.locator('[data-landing-page]')).toHaveAttribute('data-theme', theme);
+
+        const css = (sel: string, prop: string) => page.locator(sel).first().evaluate(
+          (el, p) => getComputedStyle(el).getPropertyValue(p), prop);
+        const brand = page.locator('[data-hero-brand]');
+        await expect(brand).toHaveCount(1);
+        await expect(brand).toHaveText('كوادرنا');
+        expect(await css('[data-hero-brand]', 'color')).toBe(primary);
+        for (const sel of ['.ld-h1__lead', '.ld-h1__accent']) {
+          expect(await css(sel, 'font-size')).toBe('35px');
+          expect(await css(sel, 'color')).toBe(ink);
+        }
+
+        const headings = await page.locator('h2.ld-h2, h2.ld-final__title').evaluateAll(els => els.map(el => ({
+          id: el.id, size: getComputedStyle(el).fontSize, color: getComputedStyle(el).color,
+          onBand: !!el.closest('.ld-ai, .ld-final'),
+        })));
+        expect(headings.length).toBeGreaterThanOrEqual(9);
+        for (const h of headings) {
+          expect(h.size, h.id).toBe('32px');
+          expect(h.color, h.id).toBe(h.onBand ? 'rgb(255, 255, 255)' : primary);
+        }
+
+        const cards = await page.locator('[data-value-item]').evaluateAll(els => els.map(el => ({
+          title: getComputedStyle(el.querySelector('.ld-value__item-title')!).color,
+          shadow: getComputedStyle(el).boxShadow,
+        })));
+        expect(cards).toHaveLength(7);
+        for (const c of cards) { expect(c.title).toBe(primary); expect(c.shadow).not.toBe('none'); }
+
+        expect(await css('#ai', 'background-color')).toBe('rgb(29, 78, 216)');
+        const borders = await page.locator('.ld-ai__flow li span').evaluateAll(els => els.map(el => getComputedStyle(el).borderTopColor));
+        expect(borders.length).toBeGreaterThan(0);
+        for (const b of borders) expect(b).toBe('rgb(255, 255, 255)');
+      }
+      await page.evaluate(() => window.localStorage.removeItem('ld-theme'));
+    });
+  }
+
   test('theme toggle switches Light/Dark, remembers the choice and never overflows', async ({ page }) => {
     const root = page.locator('[data-landing-page]');
     const toggle = page.locator('[data-theme-toggle]');

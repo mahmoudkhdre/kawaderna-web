@@ -1,4 +1,4 @@
-import { CTA, HERO, VALUE } from '../content';
+import { BRAND, CTA, HERO, VALUE } from '../content';
 import { AltChannelsLink, DemoLink, InquiryLink, ModuleIcon } from './primitives';
 import dashboardImg from '../assets/figma-dashboard.jpg';
 import employeeImg from '../assets/figma-employee-m.jpg';
@@ -24,6 +24,19 @@ const ProductStage = () => (
   </figure>
 );
 
+/** Colours only the brand name inside a heading line; the copy itself stays in content.ts. */
+const BrandWord = ({ text }: { text: string }) => {
+  const at = text.indexOf(BRAND.name);
+  if (at < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, at)}
+      <span className="ld-h1__brand" data-hero-brand="true">{BRAND.name}</span>
+      {text.slice(at + BRAND.name.length)}
+    </>
+  );
+};
+
 /** Commercial value near the hero: seven areas, each with a non-colour-only state (filled vs hollow marker + text). */
 const ValueOverview = () => (
   <div className="ld-value" data-value-overview="true" role="group" aria-labelledby="ld-value-title">
@@ -48,7 +61,7 @@ export const Hero = ({ demoHref, onStartDemo, contactHref }: { demoHref: string;
     <div className="ld-container ld-hero__inner">
       <div className="ld-hero__copy">
         <h1 id="ld-hero-title" className="ld-h1">
-          <span className="ld-h1__lead">{HERO.titleLead}</span>{' '}
+          <span className="ld-h1__lead"><BrandWord text={HERO.titleLead} /></span>{' '}
           <span className="ld-h1__accent">{HERO.titleAccent}</span>
         </h1>
         <p className="ld-hero__lede">{HERO.lede}</p>

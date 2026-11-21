@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { AlertTriangle, CheckCircle2, Circle, CircleDot } from 'lucide-react';
 import { BalanceSufficiency } from '../../domain/leave/selectors';
 import type { ManagerRequestDetail } from '../../domain/leave/selectors';
-import { formatDateRange, formatDateTime, formatDays } from '../../lib/format';
+import { formatDateRange, formatDateTime, formatDays, formatNumber } from '../../lib/format';
 import { tokens } from '../../lib/tokens';
 import {
   auditEventLabel, balanceLabel, decisionLabel, leaveTypeLabel, LOW_BALANCE_HR_PATH,
@@ -108,6 +108,9 @@ export const BalanceSection = ({ d }: { d: ManagerRequestDetail }) => {
       <p className="m-0" data-balance={d.balance.sufficiency} style={{ fontSize: tokens.fontSizes.sm, fontWeight: tokens.fontWeights.medium }}>
         {balanceLabel[d.balance.sufficiency]}
       </p>
+      {d.balance.annualBalanceBeforeDays !== undefined && (
+        <Field label="رصيد الإجازة السنوية قبل الطلب (بالأيام)">{formatNumber(d.balance.annualBalanceBeforeDays)}</Field>
+      )}
       {insufficient && (
         <p className="m-0" data-low-balance-path="true" style={{ fontSize: tokens.fontSizes.sm }}>
           {LOW_BALANCE_HR_PATH}

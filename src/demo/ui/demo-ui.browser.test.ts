@@ -113,13 +113,13 @@ describe('Gap 5 presentation components rendered in Chromium (no App composition
       await browserExpect(page.getByLabel('كلمة المرور', { exact: true })).toHaveValue('Demo2026!');
       expect(await calls()).toEqual([]);
     });
-    it('invalid credentials announce the approved alert, clear the password, keep focus and stay recoverable', async () => {
+    it('invalid credentials announce the approved alert, keep the typed values (O-5), keep focus and stay recoverable', async () => {
       await open('login');
       await page.getByLabel('معرّف المستخدم', { exact: true }).fill('manager-demo');
       await page.getByLabel('كلمة المرور', { exact: true }).fill('wrong');
       await page.keyboard.press('Enter');
-      await browserExpect(page.getByRole('alert')).toHaveText('معرّف المستخدم أو كلمة المرور غير صحيحة');
-      await browserExpect(page.getByLabel('كلمة المرور', { exact: true })).toHaveValue('');
+      await browserExpect(page.getByRole('alert')).toHaveText('معرّف المستخدم أو كلمة المرور غير صحيحة. راجع الحقلين ثم أعد المحاولة.');
+      await browserExpect(page.getByLabel('كلمة المرور', { exact: true })).toHaveValue('wrong');
       await browserExpect(page.getByLabel('كلمة المرور', { exact: true })).toBeFocused();
       await browserExpect(page.getByLabel('معرّف المستخدم', { exact: true })).toHaveValue('manager-demo');
       await page.getByLabel('كلمة المرور', { exact: true }).fill('D');

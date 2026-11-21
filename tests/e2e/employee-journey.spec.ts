@@ -9,12 +9,13 @@ for (const width of [1440, 375]) {
     await page.setViewportSize({ width, height: 900 });
     await freshDemo(page);
     await login(page, 'employee');
-    await expect(page.getByText('لا توجد طلبات مقدّمة بعد.')).toBeVisible();
+    await expect(page.getByText('لم تقدّم أي طلب إجازة بعد')).toBeVisible();
     await page.getByLabel('تاريخ البداية').fill('2026-02-02');
     await page.getByLabel('تاريخ النهاية').fill('2026-02-06');
     await page.getByLabel('عدد أيام الإجازة المطلوبة').fill('5');
     await page.getByRole('button', { name: 'إرسال الطلب' }).click();
-    await expect(page.getByRole('alert')).toContainText('أكّد اطلاعك');
+    await expect(page.locator('#employee-ack-error')).toContainText('أكّد اطلاعك'); // O-3: the message is under its field
+    await expect(page.getByRole('alert')).toContainText('لم يُرسل الطلب');
     if (width === 375) await page.screenshot({ path: testInfo.outputPath('employee-warning-error-375.png'), fullPage: true });
     await page.getByRole('checkbox').check();
     await page.getByRole('button', { name: 'إرسال الطلب' }).click();

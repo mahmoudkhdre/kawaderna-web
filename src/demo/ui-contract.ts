@@ -5,14 +5,19 @@ import type { SnapshotLoadResult } from './snapshot';
 import type { getDemoNavigation } from './navigation';
 
 /** T011a presentation contract. Claude owns components; Codex alone composes them in T011b.
- * Login owns its field drafts/quick-fill. onLogin failure must clear the password draft,
- * keep the session logged out and announce DEMO_COPY.invalidLogin with role="alert".
+ * Login owns its field drafts/quick-fill. onLogin failure must keep the session logged out and announce
+ * DEMO_COPY.invalidLogin with role="alert". Owner decision O-5 (2026-11-17) replaces the earlier rule that cleared the
+ * password draft: the typed values are kept so they can be corrected (focus returns to the password, text selected).
  * No controller/snapshot ever receives a stored password. */
 export interface DemoLoginProps {
   onLogin: (loginId: string, password: string) => LoginResult;
   recoveryNotice: string | null;
   storageNotice: string | null;
   onDismissRecovery: () => void;
+  /** 006: optional guide content shown above the sign-in card (never replaces it). */
+  intro?: ReactNode;
+  /** 006: account the tour suggests next. Pre-fills the public demo credentials; signing in stays the user's action. */
+  suggestedLoginId?: string;
 }
 export interface DemoSessionControlsProps {
   session: DemoSession;
@@ -50,6 +55,12 @@ export interface DemoResetConfirmationProps {
 }
 export interface DemoShellProps extends DemoSessionControlsProps, DemoNavigationProps {
   children: ReactNode;
+  /** 006: optional non-modal guide rendered above the page content. */
+  guide?: ReactNode;
+  /** 006: the one central contact link (resolved in App). Shown as a quiet link under the page, never as a modal. */
+  contactHref?: string;
+  /** 006: Manager only, while the tracked request waits: a skip link from the page start straight to its action. */
+  skipToTracked?: { label: string; onActivate: () => void };
   toast: DemoToastProps;
   storageNotice: string | null;
 }

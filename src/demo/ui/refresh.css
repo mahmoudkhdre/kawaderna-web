@@ -1,0 +1,154 @@
+/*
+ * 006 P5 — visual refresh (visual layer only). Applies the approved Design System tokens (--kd-*, see demo-ui.css)
+ * across Employee, Manager and HR. No business logic, permission, DOM contract or data-* selector is changed.
+ *
+ * Frozen-screen exception (owner D3, 2026-11-17): Manager/HR surfaces are restyled by selector from here, plus
+ * additive class names. Text colours asserted by existing tests (foreground and destructive) are NOT changed.
+ * Hierarchy: canvas Zinc/50 → white bordered cards → muted wells. Primary blue marks the one thing to look at.
+ */
+
+/* ---------- canvas, header ---------- */
+.kd-shell { background: var(--kd-page); }
+.kd-shell__main { background: var(--kd-page); }
+.kd-shell__content { background: var(--kd-page); }
+.kd-header { box-shadow: var(--kd-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, .05)); }
+.kd-footnote { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0 12px; padding: 8px 16px 20px; }
+.kd-fixednote { margin: 0; padding: 0; text-align: center; font-size: 12px; line-height: 16px; color: var(--kd-text-2); }
+.kd-rail { background: #fff; }
+.kd-contact { margin: 0; padding: 0; text-align: center; font-size: 12px; line-height: 16px; }
+.kd-contact__link { display: inline; color: var(--kd-accent); font-size: 12px; line-height: 16px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.kd-contact__link:hover { color: var(--kd-primary-950); }
+@media (max-width: 767px) {
+  .kd-footnote { padding-bottom: 8px; }
+  .kd-contact__link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; font-size: 14px; line-height: 20px; }
+}
+
+/* ---------- page headers (Employee / Manager / HR) ---------- */
+.kd-shell main > h1, .kd-shell main > header > h1, .employee-page__intro h1 {
+  display: flex; align-items: center; gap: 12px; margin: 0; color: var(--kd-foreground);
+  font-size: 30px; line-height: 36px; font-weight: 700;
+}
+.kd-shell main > h1::before, .kd-shell main > header > h1::before, .employee-page__intro h1::before {
+  content: ''; flex: none; width: 4px; height: 32px; border-radius: 2px; background: var(--kd-accent);
+}
+.kd-shell main > h1 + p, .kd-shell main > header > h1 + p, .employee-page__intro p { color: var(--kd-text-2) !important; font-size: 16px; line-height: 24px; }
+.kd-shell main > h1 + p { margin: 4px 0 20px; }
+@media (max-width: 767px) {
+  .kd-shell main > h1, .kd-shell main > header > h1, .employee-page__intro h1 { font-size: 24px; line-height: 32px; }
+  .kd-shell main > h1::before, .kd-shell main > header > h1::before, .employee-page__intro h1::before { height: 24px; }
+}
+
+/* ---------- shared surfaces ---------- */
+.employee-card, .kd-surface, .kd-empty, [data-layout="table"], [data-layout="cards"] > li, [data-filters] {
+  box-shadow: var(--kd-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, .05));
+}
+.kd-surface { border-color: var(--kd-border) !important; border-radius: 12px !important; background: var(--kd-card) !important; }
+.kd-surface dl { margin-block: 16px 0; }
+.kd-surface dt { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--kd-text-2); }
+.kd-surface dd { margin: 4px 0 0 !important; font-size: 16px; line-height: 24px; font-weight: 700; color: var(--kd-foreground); }
+.kd-surface h3 { font-size: 16px; line-height: 24px; color: var(--kd-foreground); }
+.kd-surface ol { margin: 8px 0 0; padding-inline-start: 24px; display: flex; flex-direction: column; gap: 4px; }
+.kd-surface-inset { border-color: var(--kd-primary-300) !important; background: var(--kd-surface-info); border-radius: 12px !important; }
+.kd-surface button:not(:disabled), .kd-surface-inset button:not(:disabled) { transition: filter 150ms ease; }
+.kd-surface button:not(:disabled):hover, .kd-surface-inset button:not(:disabled):hover { filter: brightness(.94); }
+.kd-surface button:not(:disabled):active, .kd-surface-inset button:not(:disabled):active { filter: brightness(.88); }
+.kd-outcome-title { display: flex; align-items: center; gap: 12px; margin: 0 0 8px; font-size: 20px; line-height: 28px; }
+
+/* ---------- Employee ---------- */
+.employee-page { padding-block: 24px 8px; }
+.employee-page__intro p { margin: 4px 0 24px; }
+.employee-card { border-radius: 12px; padding: 24px; }
+.employee-card h2 { font-size: 18px; line-height: 28px; font-weight: 700; margin-bottom: 16px; }
+.employee-balance { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border: 1px solid var(--kd-primary-300); border-radius: 12px; background: var(--kd-surface-info); color: var(--kd-text-2); font-size: 14px; line-height: 20px; }
+.employee-balance strong { font-size: 20px; line-height: 28px; font-weight: 700; color: var(--kd-accent); }
+.employee-field label { color: var(--kd-foreground); }
+.employee-field p { color: var(--kd-text-2); }
+.employee-warning { border: 1px solid var(--kd-primary-300); border-inline-start: 4px solid var(--kd-accent); border-radius: 8px; background: var(--kd-surface-info); }
+.employee-error, .employee-success { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 12px; padding: 12px; border-radius: 8px; border: 1px solid var(--kd-border); background: #fff; color: var(--kd-foreground); font-size: 14px; line-height: 20px; }
+.employee-error { border-color: var(--kd-destructive); }
+.employee-error svg { color: var(--kd-destructive); flex: none; margin-top: 1px; }
+/* O-3: inline field message. The text keeps the foreground colour (readable on white and on the info-tinted warning box);
+   the destructive colour is carried by the icon, the field border and the warning box border, so colour is never alone. */
+.employee-field .employee-field__error, .employee-warning .employee-field__error { display: flex; align-items: flex-start; gap: 4px; margin: 4px 0 0; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--kd-foreground); }
+.employee-field__error svg { flex: none; margin-top: 2px; color: var(--kd-destructive); }
+/* A field focused after a refused submit must not end up under the sticky mobile header (spacing 32 = 128px: back strip + header + 8). */
+@media (max-width: 767px) { .employee-field input, .employee-warning input { scroll-margin-top: 128px; } }
+.employee-warning.employee-warning--invalid { border-color: var(--kd-destructive); border-inline-start-color: var(--kd-destructive); }
+.employee-success { border-color: var(--kd-success); }
+.employee-success svg { color: var(--kd-success); flex: none; margin-top: 1px; }
+.employee-submit { border-radius: 8px; transition: filter 150ms ease; }
+.employee-submit:hover { filter: brightness(.92); }
+.employee-submit:active { filter: brightness(.88); }
+.employee-requests { gap: 12px; }
+.employee-request { border-radius: 12px; background: #fff; box-shadow: var(--kd-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, .05)); }
+.employee-request__head { align-items: center; }
+.employee-request p { color: var(--kd-text-2); }
+.employee-request h3 { font-size: 14px; line-height: 20px; color: var(--kd-text-2); font-weight: 700; margin: 16px 0 8px; }
+.kd-pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; border: 1px solid var(--kd-border); background: var(--kd-surface-muted); color: var(--kd-foreground); font-size: 14px; line-height: 20px; font-weight: 700; }
+.kd-pill::before { content: ''; width: 8px; height: 8px; border-radius: 9999px; background: var(--kd-text-2); }
+.kd-pill[data-status="approved"]::before { background: var(--kd-success); }
+.kd-pill[data-status="rejected"]::before { background: var(--kd-destructive); }
+.kd-pill[data-status="pending"]::before { background: var(--kd-primary-500); }
+/* approval path as a vertical timeline */
+.employee-path, .employee-audit { list-style: none; padding-inline-start: 0 !important; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.employee-path li, .employee-audit li { position: relative; padding-inline-start: 24px; font-size: 14px; line-height: 20px; color: var(--kd-foreground); }
+.employee-path li::before, .employee-audit li::before { content: ''; position: absolute; inset-inline-start: 0; top: 4px; width: 12px; height: 12px; border-radius: 9999px; border: 2px solid var(--kd-ring2); background: #fff; }
+.employee-path li[data-step-status="approved"]::before { background: var(--kd-accent); border-color: var(--kd-accent); }
+.employee-path li[data-step-status="rejected"]::before { background: var(--kd-destructive); border-color: var(--kd-destructive); }
+.employee-audit li::before { border-color: var(--kd-primary-300); background: var(--kd-surface-info); }
+.employee-reason { border-inline-start: 3px solid var(--kd-destructive); background: var(--kd-surface-muted) !important; color: var(--kd-foreground) !important; }
+
+/* ---------- Manager ---------- */
+[data-layout="table"] { border: 1px solid var(--kd-border); border-radius: 12px; background: #fff; overflow: hidden; }
+[data-layout="table"] table { background: #fff; }
+[data-layout="table"] tbody tr { transition: background-color 150ms ease; }
+/* Hover cue is an outline, not a tint: the frozen table's legacy label colours are ~4.5:1 on white only (see trackedStyle.ts). */
+[data-layout="table"] tbody tr:hover { outline: 1px solid var(--kd-primary-300); outline-offset: -1px; }
+[data-layout="table"] tbody tr:last-child { border-bottom: 0 !important; }
+[data-layout="cards"] > li { border-color: var(--kd-border) !important; }
+[data-layout="table"] button[data-action], [data-layout="cards"] button[data-action] { border-radius: 8px !important; transition: filter 150ms ease, background-color 150ms ease; }
+[data-layout="table"] button[data-action="review-approve"]:hover, [data-layout="cards"] button[data-action="review-approve"]:hover { filter: brightness(.92); }
+[data-layout="table"] button[data-action="reject"]:hover, [data-layout="cards"] button[data-action="reject"]:hover { background: var(--kd-page) !important; }
+[data-filters] { padding: 12px; border: 1px solid var(--kd-border); border-radius: 12px; background: #fff; }
+
+/* ---------- HR ---------- */
+.kd-shell main[dir="rtl"] > label, .kd-shell main[dir="rtl"] > div > label { color: var(--kd-foreground); }
+.kd-shell main #hr-request-selection { border-radius: 8px; }
+
+/* ---------- empty states: shadow token ---------- */
+.kd-empty { box-shadow: var(--kd-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, .05)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .kd * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* ---------- form fields (owner decision D12, 2026-11-17) ----------
+ * Resting boundary: Figma `muted-foreground` (Zinc/500) = 4.83:1 on white, so a field is findable without
+ * relying on the 1.23:1 Figma `--input` hairline. This is a documented, accessibility-driven exception to the Figma
+ * field border (no new colour: an existing semantic token). States are separate cues:
+ *   rest  Zinc/500 1px  ·  hover Zinc/700 1px (10.4:1)  ·  focus accent border + 2px accent outline (6.7:1)  ·
+ *   error destructive border (4.83:1) + icon/text message + aria-invalid (the focus outline still shows on an invalid field). */
+:root, .kd { --kd-field-border: var(--kd-muted); --kd-field-border-hover: var(--kd-text-2); }
+/* The field list is wrapped in :where() so it adds no specificity: state rules below then order cleanly
+   (rest < hover < invalid < focus; a focused invalid field keeps its error border AND shows the accent outline). */
+:where(.kd-input, .kd-select, .employee-field input:not([type="checkbox"]):not([type="radio"]),
+  .kd-shell select, .kd-shell textarea, .kd-shell input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  [data-reject-root] textarea, [data-filters] input, [data-filters] select) { border-color: var(--kd-field-border) !important; background-color: #fff; transition: border-color 150ms ease; }
+:where(.kd-input, .kd-select, .employee-field input:not([type="checkbox"]):not([type="radio"]),
+  .kd-shell select, .kd-shell textarea, .kd-shell input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  [data-reject-root] textarea, [data-filters] input, [data-filters] select):hover:not(:disabled) { border-color: var(--kd-field-border-hover) !important; }
+:where(.kd-input, .kd-select, .employee-field input:not([type="checkbox"]):not([type="radio"]),
+  .kd-shell select, .kd-shell textarea, .kd-shell input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  [data-reject-root] textarea, [data-filters] input, [data-filters] select)[aria-invalid="true"] { border-color: var(--kd-destructive) !important; }
+:where(.kd-input, .kd-select, .employee-field input:not([type="checkbox"]):not([type="radio"]),
+  .kd-shell select, .kd-shell textarea, .kd-shell input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  [data-reject-root] textarea, [data-filters] input, [data-filters] select):focus-visible { border-color: var(--kd-accent) !important; outline: 2px solid var(--kd-accent) !important; outline-offset: 2px !important; box-shadow: none !important; }
+:where(.kd-input, .kd-select, .employee-field input:not([type="checkbox"]):not([type="radio"]),
+  .kd-shell select, .kd-shell textarea, .kd-shell input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  [data-reject-root] textarea, [data-filters] input, [data-filters] select)[aria-invalid="true"]:focus-visible { border-color: var(--kd-destructive) !important; }
+:where(.kd-input, .kd-select, .employee-field input:not([type="checkbox"]):not([type="radio"]),
+  .kd-shell select, .kd-shell textarea, .kd-shell input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  [data-reject-root] textarea, [data-filters] input, [data-filters] select):disabled { border-color: var(--kd-ring2) !important; background-color: var(--kd-surface-muted); color: var(--kd-text-2); cursor: not-allowed; }
+/* The reject modal is portalled outside .kd: give its focusable controls the same 2px accent ring (it used the legacy blue). */
+[data-reject-root] :focus-visible { outline: 2px solid var(--kd-accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .kd-input, .kd-select, .kd-shell select, .kd-shell textarea, .kd-shell input { transition: none; } }

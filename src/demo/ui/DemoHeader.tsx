@@ -1,13 +1,13 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
-import { Bell, Crown, LogOut, MapPin, RotateCcw, User } from 'lucide-react';
+import { Bell, LogOut, MapPin, RotateCcw, User } from 'lucide-react';
 import type { DemoSessionControlsProps } from '../ui-contract';
 import { HEADER_TEXT } from './text';
 import './demo-ui.css';
 
 const Brand = ({ size, mobile }: { size: number; mobile?: boolean }) => (
   <div className="kd-brand">
-    <span className="kd-logo" style={{ width: size, height: size }} aria-hidden="true"><Crown size={size === 52 ? 32 : 20} /></span>
+    <span className="kd-logo" style={{ width: size, height: size }} aria-hidden="true"></span>
     <div style={{ minWidth: 0 }}>
       <p className="kd-brand__title">{HEADER_TEXT.product}</p>
       {!mobile && (

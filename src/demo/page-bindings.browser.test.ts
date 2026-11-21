@@ -87,7 +87,7 @@ describe('Chain A rendered bindings without Login/shell composition', () => {
     await page.evaluate(() => window.chainA.login('hr-demo', 'Demo2026!'));
     for (const width of [320, 360, 375, 390, 430, 1440]) {
       await page.setViewportSize({ width, height: 850 });
-      await browserExpect(page.getByText('لا توجد طلبات بانتظار مراجعة الموارد البشرية', { exact: true })).toBeVisible();
+      await browserExpect(page.getByText('لا توجد طلبات بانتظار مراجعتك حاليًا', { exact: true })).toBeVisible();
       await browserExpect(page.locator('main button')).toHaveCount(0);
       await browserExpect(page.locator('main')).toHaveAttribute('dir', 'rtl');
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -127,7 +127,7 @@ describe('Chain A rendered bindings without Login/shell composition', () => {
     await page.getByRole('button', { name: 'رفض الطلب', exact: true }).click();
     await page.getByLabel('سبب الرفض للموظف').fill('مسودة لا تنتقل إلى طلب آخر');
     await page.evaluate(() => window.chainARenderHr({ ...window.chainA.hr!, requestId: null }));
-    await browserExpect(page.getByText('لا توجد طلبات بانتظار مراجعة الموارد البشرية', { exact: true })).toBeVisible();
+    await browserExpect(page.getByText('لا توجد طلبات بانتظار مراجعتك حاليًا', { exact: true })).toBeVisible();
     await page.evaluate(() => window.chainARenderHr(window.chainA.hr!));
     await page.getByRole('button', { name: 'رفض الطلب', exact: true }).click();
     await browserExpect(page.getByLabel('سبب الرفض للموظف')).toHaveValue('');
@@ -135,7 +135,7 @@ describe('Chain A rendered bindings without Login/shell composition', () => {
     await page.evaluate(() => window.chainARenderHr({ ...window.chainA.hr!, requests: window.chainA.requests.map(request => request.requestId === 'LV-2026-102' ? { ...request, version: 2 } : request) }));
     await browserExpect(page.getByRole('button', { name: 'تأكيد القرار', exact: true })).toHaveCount(0);
     await page.evaluate(() => window.chainARenderHr({ ...window.chainA.hr!, actor: { id: 'MGR-2001', role: 'manager' } }));
-    await browserExpect(page.getByText('لا توجد طلبات بانتظار مراجعة الموارد البشرية', { exact: true })).toBeVisible();
+    await browserExpect(page.getByText('لا توجد طلبات بانتظار مراجعتك حاليًا', { exact: true })).toBeVisible();
     await browserExpect(page.locator('main button')).toHaveCount(0);
   }, 30000);
 });

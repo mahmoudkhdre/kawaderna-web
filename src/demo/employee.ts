@@ -34,6 +34,18 @@ const nextRequestId = (requests: LeaveRequest[]): string => {
   return `LV-2026-${Math.max(106, ...existing) + 1}`;
 };
 
+const spanDays = (start: Date, end: Date): number => Math.round((end.getTime() - start.getTime()) / 86_400_000) + 1;
+
+/**
+ * The most days the validation below accepts for a period (the period's own length), or null when the dates are
+ * not a valid period. Exported so the form can name the real limit instead of repeating the rule by hand.
+ */
+export const employeeDurationLimit = (startDate: string, endDate: string): number | null => {
+  const start = parseRiyadhDate(startDate);
+  const end = parseRiyadhDate(endDate);
+  return start && end && end >= start ? spanDays(start, end) : null;
+};
+
 /** The existing draft scenarios supply policy/risk inputs; transitions own every workflow change. */
 export const submitEmployeeDemoRequest = (state: DemoState, input: EmployeeRequestInput): EmployeeSubmitResult => {
   const account = state.session && restoreSession(state.session.persona, state.session.loginId);
@@ -41,7 +53,7 @@ export const submitEmployeeDemoRequest = (state: DemoState, input: EmployeeReque
   const startDate = parseRiyadhDate(input.startDate);
   const endDate = parseRiyadhDate(input.endDate);
   if (!startDate || !endDate || endDate < startDate) return { ok: false, error: 'invalid_dates' };
-  const span = Math.round((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1;
+  const span = spanDays(startDate, endDate);
   if (!Number.isInteger(input.durationWorkingDays) || input.durationWorkingDays < 1 || input.durationWorkingDays > span) {
     return { ok: false, error: 'invalid_duration' };
   }

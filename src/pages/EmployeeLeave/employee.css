@@ -1,20 +1,21 @@
-.employee-page { width: min(1120px, 100%); margin-inline: auto; padding: 24px; color: var(--kd-foreground); }
-.employee-page__intro h1 { margin: 0; font-size: 28px; line-height: 1.3; }
-.employee-page__intro p { margin: 6px 0 24px; color: var(--kd-muted); }
+.employee-page { width: min(1280px, 100%); margin-inline: auto; padding: 24px; color: var(--kd-foreground); }
+.employee-page__intro h1 { margin: 0; font-size: 30px; line-height: 1.3; }
+.employee-page__intro p { margin: 8px 0 24px; color: var(--kd-muted); }
 .employee-page__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
 .employee-card { min-width: 0; padding: 24px; border: 1px solid var(--kd-border); border-radius: 8px; background: #fff; }
 .employee-card h2 { margin: 0 0 16px; font-size: 20px; }
 .employee-balance { margin: 0 0 20px; padding: 12px; border-radius: 6px; background: var(--kd-surface-info); }
 .employee-field { margin-bottom: 16px; }
-.employee-field label { display: block; margin-bottom: 6px; font-weight: 600; }
-.employee-field input { display: block; width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid var(--kd-border); border-radius: 6px; color: var(--kd-foreground); font: inherit; }
-.employee-field p { margin: 4px 0 0; font-size: 14px; color: var(--kd-muted); }
+.employee-field label { display: block; margin-bottom: 8px; font-weight: 600; }
+.employee-field input { display: block; width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--kd-border); border-radius: 6px; color: var(--kd-foreground); font: inherit; }
+.employee-field p { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--kd-muted); }
 .employee-warning { margin-bottom: 16px; padding: 12px; border: 1px solid var(--kd-accent); border-radius: 6px; background: var(--kd-surface-info); }
-.employee-warning p { margin: 0 0 10px; }
-.employee-warning label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.employee-warning input { width: 18px; height: 18px; flex: none; }
+.employee-warning p { margin: 0 0 12px; }
+/* D4: the whole label row is the target (44px high, full width); the box itself is 20px (spacing token 5). */
+.employee-warning label { display: flex; align-items: center; gap: 12px; min-height: 44px; padding-block: 8px; cursor: pointer; }
+.employee-warning input { width: 20px; height: 20px; flex: none; accent-color: var(--kd-accent); }
 .employee-error { margin: 0 0 12px; color: var(--kd-destructive); }
-.employee-success { color: #166534; }
+.employee-success { color: var(--kd-foreground); }
 .employee-submit { scroll-margin-block-end: 16px; width: 100%; min-height: 44px; border: 0; border-radius: 6px; color: #fff; background: var(--kd-accent); font: inherit; font-weight: 700; cursor: pointer; }
 .employee-empty { color: var(--kd-muted); }
 .employee-requests { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
@@ -22,10 +23,15 @@
 .employee-request p { margin: 8px 0; }
 .employee-request__head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 .employee-request__head strong { unicode-bidi: isolate; }
-.employee-request h3 { margin: 16px 0 6px; font-size: 16px; }
-.employee-request ol { padding-inline-start: 22px; }
+.employee-request h3 { margin: 16px 0 8px; font-size: 16px; }
+.employee-request ol { padding-inline-start: 24px; }
 .employee-request li { overflow-wrap: anywhere; }
 /* The rejection reason is shown as written: line breaks and spacing are preserved. */
-.employee-reason { padding: 10px; background: var(--kd-surface-info); border-radius: 6px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.employee-reason { padding: 12px; background: var(--kd-surface-info); border-radius: 6px; overflow-wrap: anywhere; white-space: pre-wrap; }
 .employee-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 @media (max-width: 767px) { .employee-page { padding: 16px; } .employee-page__grid { grid-template-columns: minmax(0, 1fr); gap: 16px; } .employee-card { padding: 16px; } }
+.employee-outcome { margin: 0 0 12px; }
+.employee-outcome .employee-success { margin-bottom: 8px; }
+.employee-next { display: flex; }
+.employee-next .kd-btn { width: 100%; }
+.employee-count { margin: 0 0 12px; font-size: 14px; line-height: 20px; color: var(--kd-text-2); }

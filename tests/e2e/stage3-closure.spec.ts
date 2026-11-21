@@ -24,7 +24,8 @@ for (const width of [320, 360, 375, 390, 430]) {
     await page.getByLabel('عدد أيام الإجازة المطلوبة').fill('5');
     const submit = page.getByRole('button', { name: 'إرسال الطلب' });
     await submit.click();
-    await expect(page.getByRole('alert')).toContainText('أكّد اطلاعك');
+    await expect(page.locator('#employee-ack-error')).toContainText('أكّد اطلاعك'); // O-3: the message is under its field
+    await expect(page.getByRole('alert')).toContainText('لم يُرسل الطلب');
     await submit.focus();
     const button = await submit.boundingBox();
     expect(button!.y + button!.height).toBeLessThanOrEqual(nav!.y);

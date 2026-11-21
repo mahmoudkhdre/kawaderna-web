@@ -58,7 +58,8 @@ describe('T009/T010 controlled and standalone page bindings', () => {
     owner.getSnapshot().hr!.onDecide('LV-2026-102', 1, decision, 'سبب واضح');
     const final = renderToStaticMarkup(<HRFinalDecisionPage binding={owner.getSnapshot().hr!} />);
     expect(final).toContain('LV-2026-102');
-    expect(final).toContain('HR-1');
+    expect(final).toContain('الموارد البشرية (هند الدوسري)'); // DF-02: role label, not the internal id
+    expect(final).not.toContain('HR-1');
     expect(final).toContain(decision === 'approve' ? 'تمت الموافقة النهائية' : 'تم الرفض النهائي');
     if (decision === 'reject') expect(final).toContain('سبب واضح');
     expect(final).not.toMatch(/<button|<textarea/);

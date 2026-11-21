@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { approveDemoAsManager, createBaselineState, decideDemoAsHr } from './state';
 import { DEMO_ACCOUNTS } from './session';
-import { selectEmployeeDemoRequests, submitEmployeeDemoRequest } from './employee';
+import { employeeDurationLimit, selectEmployeeDemoRequests, submitEmployeeDemoRequest } from './employee';
 import { loadDemoSnapshot, serializeDemoSnapshot } from './snapshot';
 import { createDemoController } from './controller';
 
@@ -113,5 +113,25 @@ describe('employee demo submission', () => {
     expect(loadDemoSnapshot({ ...storage, getItem: () => legacy }).state.session).toEqual(manager);
     const invalidLegacyEmployee = JSON.stringify({ ...JSON.parse(raw), schemaVersion: 1 });
     expect(loadDemoSnapshot({ ...storage, getItem: () => invalidLegacyEmployee }).source).toBe('recovery');
+  });
+});
+
+describe('D5: employeeDurationLimit is the rule the submit enforces', () => {
+  it('equals the period length (inclusive) and nothing else', () => {
+    expect(employeeDurationLimit('2026-02-02', '2026-02-06')).toBe(5);
+    expect(employeeDurationLimit('2026-02-02', '2026-02-02')).toBe(1);
+    expect(employeeDurationLimit('2026-02-27', '2026-03-02')).toBe(4);
+  });
+  it('is null for anything the submit rejects as invalid_dates', () => {
+    expect(employeeDurationLimit('', '2026-02-06')).toBeNull();
+    expect(employeeDurationLimit('2026-02-06', '2026-02-02')).toBeNull();
+    expect(employeeDurationLimit('2026-02-30', '2026-03-02')).toBeNull();
+    expect(submitEmployeeDemoRequest(state(), { ...input(), startDate: '2026-02-06', endDate: '2026-02-02' })).toEqual({ ok: false, error: 'invalid_dates' });
+  });
+  it('the submit accepts exactly the limit and refuses one more', () => {
+    const limit = employeeDurationLimit('2026-02-02', '2026-02-06')!;
+    expect(submitEmployeeDemoRequest(state(), input(limit, true)).ok).toBe(true);
+    expect(submitEmployeeDemoRequest(state(), input(limit + 1, true))).toEqual({ ok: false, error: 'invalid_duration' });
+    expect(submitEmployeeDemoRequest(state(), input(0, true))).toEqual({ ok: false, error: 'invalid_duration' });
   });
 });

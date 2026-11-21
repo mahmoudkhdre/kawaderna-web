@@ -42,8 +42,11 @@
 @font-face { font-family: 'Tajawal'; font-style: normal; font-weight: 400; font-display: swap; src: url('./features/landing/assets/fonts/Tajawal-Regular.ttf') format('truetype'); }
 @font-face { font-family: 'Tajawal'; font-style: normal; font-weight: 500; font-display: swap; src: url('./features/landing/assets/fonts/Tajawal-Medium.ttf') format('truetype'); }
 @font-face { font-family: 'Tajawal'; font-style: normal; font-weight: 700; font-display: swap; src: url('./features/landing/assets/fonts/Tajawal-Bold.ttf') format('truetype'); }
-.demo-return { display: block; min-height: 44px; padding: 12px 16px; text-align: start; text-decoration: underline; }
-.demo-return:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
+/* D11: the "back to landing" link uses the approved semantic tokens (the element also carries .kd, which defines them),
+   not the legacy blue. accent on page grey is 6.4:1; the 2px ring is the same accent as every other control. */
+.kd.demo-return { display: block; min-height: 44px; padding: 12px 16px; background: var(--kd-page); color: var(--kd-accent); font-size: 14px; line-height: 24px; font-weight: 500; text-align: start; text-decoration: underline; text-underline-offset: 3px; }
+.kd.demo-return:hover { color: var(--kd-primary-950); }
+.kd.demo-return:focus-visible { outline: 2px solid var(--kd-accent); outline-offset: -4px; }
 
 /* The return link and the demo share one viewport-height column, so the link never adds page scroll. */
 .demo-route { display: flex; flex-direction: column; min-height: 100dvh; }

@@ -1,6 +1,6 @@
 import type { ElementType, MouseEvent, ReactNode } from 'react';
 import {
-  ArrowLeft, Calendar, ChartColumnIncreasing, Clock, CreditCard, Crown, DollarSign, HeartPulse, LayoutDashboard,
+  ArrowLeft, Calendar, ChartColumnIncreasing, Clock, CreditCard, DollarSign, HeartPulse, LayoutDashboard,
   FileText, KeyRound, ListTodo, Mail, MessageCircle, Network, Palette, Play, Settings, ShieldCheck, Sparkles, Target, Users, Wallet,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -20,11 +20,9 @@ export const ModuleIcon = ({ name, size = 18 }: { name: string; size?: number })
   return Icon ? <Icon size={size} aria-hidden="true" focusable="false" strokeWidth={1.5} /> : null;
 };
 
-/** Brand mark as drawn in the Figma header/login (`#7c3aed → #1e3a8a` tile, crown icon). */
+/** The Kawaderna mark (owner-supplied artwork: blue tile, white symbol). Decorative (a CSS background, not an image element): the brand name always sits beside it. */
 export const BrandMark = ({ size = 40 }: { size?: number }) => (
-  <span className="ld-mark" style={{ width: size, height: size }} aria-hidden="true">
-    <Crown size={Math.round(size * 0.6)} strokeWidth={1.5} />
-  </span>
+  <span className="ld-mark" style={{ width: size, height: size }} aria-hidden="true" />
 );
 
 export interface DemoLinkProps {

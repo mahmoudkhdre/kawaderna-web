@@ -18,7 +18,8 @@ test('logged-out entry, Arabic quick-fill, invalid credentials and actor IDs', a
     await page.locator('#kd-login-password').fill(password);
     await page.locator('form button[type="submit"]').click();
     await expect(page.getByRole('alert')).toHaveText(DEMO_COPY.invalidLogin);
-    await expect(page.locator('#kd-login-password')).toHaveValue('');
+    await expect(page.locator('#kd-login-password')).toHaveValue(password); // O-5: kept so it can be corrected
+    await expect(page.locator('#kd-login-id')).toHaveValue(id);
     await expect(page.locator('[data-demo-shell]')).toHaveCount(0);
     expect(await page.evaluate(key => sessionStorage.getItem(key), SNAPSHOT_KEY)).toBeNull();
   }
@@ -46,7 +47,9 @@ for (const width of [1440, 375]) {
       await freshDemo(page);
       await login(page, 'hr');
       await expect(page.getByText(DEMO_COPY.hrEmpty, { exact: true })).toBeVisible();
-      await expect(page.locator('main button')).toHaveCount(0);
+      // 006: the HR empty state now offers exactly one real action (start the guided tour); still no decision controls.
+      await expect(page.locator('main button')).toHaveText(['ابدأ تجربة مسار الموافقات']);
+      await expect(page.getByRole('button', { name: /موافقة نهائية|رفض الطلب|تأكيد القرار/ })).toHaveCount(0);
       await expect(page.locator('main')).not.toContainText('LV-2026-106');
       await sessionAction(page, 'logout');
       await login(page, 'manager');
@@ -70,7 +73,8 @@ for (const width of [1440, 375]) {
       await expect(page.locator('[data-demo-login]')).toBeVisible();
       await login(page, 'hr');
       await expect(page.locator('main')).toContainText('LV-2026-102');
-      await expect(page.locator('main')).toContainText('MGR-2001');
+      await expect(page.locator('main')).toContainText('المدير (فاطمة علي)'); // DF-02: role label, not the internal id
+      await expect(page.locator('main')).not.toContainText('MGR-2001');
       await expect(page.locator('main')).not.toContainText('LV-2026-001');
       await expect(page.getByText('سجل التحويل', { exact: true })).toBeVisible();
       await noOverflow(page);

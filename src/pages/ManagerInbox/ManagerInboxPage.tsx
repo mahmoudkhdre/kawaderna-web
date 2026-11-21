@@ -1,4 +1,8 @@
 import { useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { ClipboardCheck } from 'lucide-react';
+import { DEMO_COPY } from '../../demo/copy';
+import { EmptyState } from '../../demo/ui/EmptyState';
 import { INBOX_NOW, managerInboxFixtures } from '../../domain/leave/fixtures';
 import { approveAsManager } from '../../domain/leave/managerApproval';
 import { rejectAsManager } from '../../domain/leave/managerRejection';
@@ -14,16 +18,20 @@ import type { InboxFilters as InboxFilterState } from './filterLogic';
 import { InboxTable } from './InboxTable';
 import { RequestDetail } from './RequestDetail';
 import { RejectReasonModal } from './RejectReasonModal';
-import { EMPTY_TEXT, PAGE_SUBTITLE, PAGE_TITLE } from './labels';
+import { PAGE_SUBTITLE, PAGE_TITLE } from './labels';
 import { REJECT_SUCCESS } from './rejectionLabels';
 import type { ManagerInboxBinding } from '../../demo/contracts';
 
 // Demo context: fixtures + injected clock. Persona switching is not authentication.
 const DEMO_MANAGER_ID = 'MGR-2001';
 
-export interface ManagerInboxPageProps { binding?: ManagerInboxBinding }
+export interface ManagerInboxPageProps {
+  binding?: ManagerInboxBinding;
+  /** 006: replaces the default empty state with one that knows the guide context. Never changes the list or any decision. */
+  empty?: ReactNode;
+}
 
-export const ManagerInboxPage = ({ binding }: ManagerInboxPageProps = {}) => {
+export const ManagerInboxPage = ({ binding, empty }: ManagerInboxPageProps = {}) => {
   // Standalone fixtures remain available; controlled mode owns no duplicate request list.
   const [localRequests, setRequests] = useState<LeaveRequest[]>(() => binding ? [] : structuredClone(Object.values(managerInboxFixtures)));
   const requests = binding?.requests ?? localRequests;
@@ -43,7 +51,8 @@ export const ManagerInboxPage = ({ binding }: ManagerInboxPageProps = {}) => {
     return current && current.version === rejection.row.version && canManagerDecide(current, managerId) ? rejection : null;
   })();
   const detail = authorized && selectedId
-    ? selectManagerRequestDetail(requests, selectedId, managerId, INBOX_NOW)
+    ? selectManagerRequestDetail(requests, selectedId, managerId, INBOX_NOW,
+      import.meta.env.VITE_MANAGER_ANNUAL_BALANCE === 'true')
     : null;
   const approve = (requestId: string, expectedVersion: number) => {
     if (!authorized) return { ok: false as const, error: 'unauthorized' as const };
@@ -80,7 +89,7 @@ export const ManagerInboxPage = ({ binding }: ManagerInboxPageProps = {}) => {
         <p className="m-0 mt-1" style={{ color: tokens.colors.text.secondary }}>{PAGE_SUBTITLE}</p>
       </header>
       {rows.length === 0 ? (
-        <p>{EMPTY_TEXT}</p>
+        empty ?? <EmptyState icon={ClipboardCheck} title={DEMO_COPY.managerEmpty} body={DEMO_COPY.managerEmptyBody} hint={DEMO_COPY.managerEmptyHint} testId="manager" />
       ) : (
         <>
           <InboxFilters filters={effectiveFilters} options={filterOptions} total={rows.length} shown={visibleRows.length} onChange={setFilters} />

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { Crown, Info, X } from 'lucide-react';
+import { Info, X } from 'lucide-react';
 import type { DemoLoginProps } from '../ui-contract';
 import { DEMO_COPY } from '../copy';
 import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '../session';
@@ -11,26 +11,39 @@ const JOURNEY_ORDER = [Persona.EMPLOYEE, Persona.MANAGER, Persona.HR].map(person
 import { LOGIN_TEXT } from './text';
 import './demo-ui.css';
 
-export const DemoLogin = ({ onLogin, recoveryNotice, storageNotice, onDismissRecovery }: DemoLoginProps) => {
+export const DemoLogin = ({ onLogin, recoveryNotice, storageNotice, onDismissRecovery, intro, suggestedLoginId }: DemoLoginProps) => {
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
   const [failed, setFailed] = useState(false);
+  // Each refused attempt re-inserts the alert once, so an identical second refusal is announced again.
+  const [attempt, setAttempt] = useState(0);
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
     const result = onLogin(loginId, password);
     if (!result.ok) {
-      setPassword('');
+      // O-5: the typed values are KEPT so the user can correct them. Focus goes to the password with its text selected,
+      // so typing replaces it; the generic message names no detail (never says which of the two was wrong).
       setFailed(true);
+      setAttempt(count => count + 1);
       passwordRef.current?.focus();
+      passwordRef.current?.select();
     }
   };
   const quickFill = (id: string) => { setLoginId(id); setPassword(DEMO_PASSWORD); setFailed(false); };
+  // Tour suggestion: fills the publicly listed demo credentials, nothing more. The user still presses «تسجيل دخول».
+  // Adjusted during render when the suggestion changes (no effect needed).
+  const [seenSuggestion, setSeenSuggestion] = useState<string | undefined>(undefined);
+  if (seenSuggestion !== suggestedLoginId) {
+    setSeenSuggestion(suggestedLoginId);
+    if (suggestedLoginId) quickFill(suggestedLoginId);
+  }
 
   return (
     <div className="kd kd-login" dir="rtl" data-demo-login="true">
       <div className="kd-login__col">
+        {intro}
         {recoveryNotice && (
           <p className="kd-notice" role="status" data-recovery-notice="true">
             <Info size={16} aria-hidden="true" style={{ flex: 'none', marginTop: 2 }} />
@@ -46,7 +59,7 @@ export const DemoLogin = ({ onLogin, recoveryNotice, storageNotice, onDismissRec
         )}
         <main className="kd-card" aria-labelledby="kd-login-title">
           <div className="kd-card__head">
-            <span className="kd-logo" style={{ width: 64, height: 64 }} aria-hidden="true"><Crown size={48} /></span>
+            <span className="kd-logo" style={{ width: 64, height: 64 }} aria-hidden="true"></span>
             <h1 id="kd-login-title" className="kd-card__title">{LOGIN_TEXT.title}</h1>
             <p className="kd-card__desc">{LOGIN_TEXT.product}</p>
           </div>
@@ -69,15 +82,16 @@ export const DemoLogin = ({ onLogin, recoveryNotice, storageNotice, onDismissRec
                 aria-invalid={failed} aria-describedby={failed ? 'kd-login-error' : undefined}
                 onChange={e => { setPassword(e.target.value); if (failed) setFailed(false); }} />
             </div>
-            {failed && <p id="kd-login-error" className="kd-error" role="alert">{DEMO_COPY.invalidLogin}</p>}
+            {failed && <p key={attempt} id="kd-login-error" className="kd-error" role="alert">{DEMO_COPY.invalidLogin}</p>}
             <button type="submit" className="kd-btn kd-btn--primary">{LOGIN_TEXT.submit}</button>
           </form>
           <section className="kd-demo" aria-labelledby="kd-demo-title" data-demo-accounts="true">
             <h2 id="kd-demo-title" className="kd-demo__title">{LOGIN_TEXT.accounts}</h2>
             {JOURNEY_ORDER.map(account => (
-              <div key={account.loginId} className="kd-demo__item" data-demo-account={account.loginId}>
+              <div key={account.loginId} className="kd-demo__item" data-demo-account={account.loginId}
+                data-recommended={account.loginId === suggestedLoginId ? 'true' : undefined}>
                 <div className="kd-demo__info">
-                  <span className="kd-demo__name">{account.displayIdentity}</span>
+                  <span className="kd-demo__name">{account.displayIdentity}{account.loginId === suggestedLoginId && <span className="kd-badge">الخطوة التالية</span>}</span>
                   <span className="kd-demo__cred">{LOGIN_TEXT.userId_label} <bdi className="kd-ltr">{account.loginId}</bdi></span>
                   <span className="kd-demo__cred">{LOGIN_TEXT.password_label} <bdi className="kd-ltr">{DEMO_PASSWORD}</bdi></span>
                 </div>
